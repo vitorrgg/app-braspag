@@ -7,8 +7,8 @@
 
 const app = {
   app_id: 112906,
-  title: 'My Awesome E-Com Plus App',
-  slug: 'my-awesome-app',
+  title: 'Braspag',
+  slug: 'braspag',
   type: 'external',
   state: 'active',
   authentication: true,
