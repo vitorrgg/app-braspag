@@ -1,4 +1,8 @@
-exports.post = ({ appSdk, admin }, req, res) => {
+const { baseUri } = require('../../../__env')
+const axios = require('../../../lib/braspag/create-axios')
+const { parseStatus } = require('../../../lib/braspag/parse-utils')
+const bodyBraspag = require('../../../lib/braspag/payload-to-transaction')
+exports.post = async ({ appSdk, admin }, req, res) => {
   /**
    * Requests coming from Modules API have two object properties on body: `params` and `application`.
    * `application` is a copy of your app installed by the merchant,
@@ -17,33 +21,118 @@ exports.post = ({ appSdk, admin }, req, res) => {
   // merge all app options configured by merchant
   const appData = Object.assign({}, application.data, application.hidden_data)
   // setup required `transaction` response object
-  const transaction = {}
-
-  // indicates whether the buyer should be redirected to payment link right after checkout
-  let redirectToPayment = false
-
-  /**
-   * Do the stuff here, call external web service or just fill the `transaction` object
-   * according to the `appData` configured options for the chosen payment method.
-   */
-
-  // WIP:
-  switch (params.payment_method.code) {
-    case 'credit_card':
-      // you may need to handle card hash and create transaction on gateway API
-      break
-    case 'banking_billet':
-      // create new "Boleto bancário"
-      break
-    case 'online_debit':
-      redirectToPayment = true
-      break
-    default:
-      break
+  const { amount } = params
+  const transaction = {
+    amount: amount.total
   }
 
-  res.send({
-    redirect_to_payment: redirectToPayment,
-    transaction
-  })
+  // indicates whether the buyer should be redirected to payment link right after checkout
+  const redirectToPayment = false
+
+  const orderId = params.order_id
+
+  const { merchant_id: merchantId, merchant_key: merchantKey } = appData
+  const methodPayment = params.payment_method.code
+
+  try {
+    const braspagAxios = axios(merchantId, merchantKey)
+    const body = bodyBraspag(appData, orderId, params, methodPayment)
+    console.log('>> body ', JSON.stringify(body))
+    const { data } = await braspagAxios.post('/sales', body)
+    console.log('>> data ', JSON.stringify(data))
+
+    const payment = data.Payment
+    const intermediator = {}
+
+    if (methodPayment === 'credit_card') {
+      intermediator.transaction_id = payment.PaymentId
+      intermediator.transaction_reference = payment.ProofOfSale
+      intermediator.transaction_code = payment.AcquirerTransactionId
+      // `${payment.AuthorizationCode}`
+
+      transaction.status = {
+        current: parseStatus[payment.Status] || 'unknown',
+        updated_at: payment.CapturedDate ? new Date(`${payment.CapturedDate} UTC+0`).toISOString() : new Date().toISOString()
+      }
+    } else if (methodPayment === 'banking_billet') {
+      transaction.banking_billet = {
+        code: payment.DigitableLine,
+        valid_thru: new Date(payment.ExpirationDate).toISOString(),
+        link: payment.Url
+      }
+
+      intermediator.transaction_id = payment.PaymentId
+      intermediator.transaction_reference = payment.BoletoNumber
+      // transaction_code: data.retorno
+
+      transaction.status = {
+        current: 'pending',
+        updated_at: new Date().toISOString()
+      }
+    } else {
+      // account_deposit
+      intermediator.transaction_id = payment.PaymentId
+      intermediator.transaction_reference = payment.ProofOfSale
+      intermediator.transaction_code = payment.AcquirerTransactionId
+
+      const qrCodeBase64 = payment.QrCodeBase64Image
+      const qrCode = payment.QrCodeString
+
+      const collectionQrCode = admin.firestore().collection('qr_code_braspag')
+      await collectionQrCode.doc(orderId).set({ qrCode: qrCodeBase64 })
+
+      const qrCodeSrc = `${baseUri}/qr-code?orderId=${orderId}`
+
+      // payment.SentOrderId
+      // payment.Status
+      // payment.ProviderReturnCode
+      // payment.ProviderReturnMessage
+
+      transaction.notes = '<div style="display:block;margin:0 auto"> ' +
+            `<img src="${qrCodeSrc}" style="display:block;margin:0 auto; width:150px;"> ` +
+            `<input readonly type="text" id="pix-copy" value="${qrCode}" />` +
+            `<button type="button" class="btn btn-sm btn-light" onclick="let codePix = document.getElementById('pix-copy')
+          codePix.select()
+          document.execCommand('copy')">Copiar Pix</button></div>`
+
+      transaction.status = {
+        current: 'pending',
+        updated_at: new Date().toISOString()
+      }
+    }
+
+    console.log('>> ', intermediator)
+    transaction.intermediator = intermediator
+
+    res.send({
+      redirect_to_payment: redirectToPayment,
+      transaction
+    })
+  } catch (error) {
+    console.log(error.response)
+    // try to debug request error
+    const errCode = 'BRASPAG_TRANSACTION_ERR'
+    let { message } = error
+    const err = new Error(`${errCode} #${storeId} - ${orderId} => ${message}`)
+    if (error.response) {
+      const { status, data } = error.response
+      if (status !== 401 && status !== 403) {
+        err.payment = JSON.stringify(transaction)
+        err.status = status
+        if (typeof data === 'object' && data) {
+          err.response = JSON.stringify(data)
+        } else {
+          err.response = data
+        }
+      } else if (data && Array.isArray(data.errors) && data.errors[0] && data.errors[0].message) {
+        message = data.errors[0].message
+      }
+    }
+    console.error(err)
+    res.status(409)
+    res.send({
+      error: errCode,
+      message
+    })
+  }
 }

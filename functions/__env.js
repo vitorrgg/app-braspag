@@ -10,6 +10,7 @@ const region = FUNCTION_REGION || 'us-central1'
 const functionName = server.functionName || 'app'
 
 module.exports = {
+  isSandbox: false,
   functionName,
   operatorToken: server && server.operator_token,
   baseUri: (server && server.base_uri) ||

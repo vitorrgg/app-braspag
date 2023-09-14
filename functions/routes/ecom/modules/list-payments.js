@@ -1,4 +1,10 @@
-exports.post = ({ appSdk }, req, res) => {
+const fs = require('fs')
+const path = require('path')
+const { hostingUri, isSandbox } = require('../../../__env')
+const addInstallments = require('../../../lib/payments/add-payments')
+const OAuth2ProtectedCard = require('../../../lib/braspag/protected-card/get-auth')
+
+exports.post = async ({ appSdk }, req, res) => {
   /**
    * Requests coming from Modules API have two object properties on body: `params` and `application`.
    * `application` is a copy of your app installed by the merchant,
@@ -14,36 +20,144 @@ exports.post = ({ appSdk }, req, res) => {
 
   const { params, application } = req.body
   const { storeId } = req
-  // setup basic required response object
-  const response = {
-    payment_gateways: []
-  }
+
+  const amount = { ...params.amount } || {}
+
   // merge all app options configured by merchant
   const appData = Object.assign({}, application.data, application.hidden_data)
 
-  /* DO THE STUFF HERE TO FILL RESPONSE OBJECT WITH PAYMENT GATEWAYS */
+  if (!appData.merchant_id || !appData.merchant_key) {
+    return res.status(409).send({
+      error: 'NO_BRASPAG_KEYS',
+      message: 'merchantId e/ou merchantKey da API indefinido(s) (lojista deve configurar o aplicativo)'
+    })
+  }
 
-  /**
-   * Sample snippets:
+  const hasProtectedCard = appData.protected_card && appData.protected_card.client_id && appData.protected_card.client_secret
+  let accessTokenProtectedCard
 
-  // add new payment method option
-  response.payment_gateways.push({
-    intermediator: {
-      code: 'paupay',
-      link: 'https://www.palpay.com.br',
-      name: 'paupay'
-    },
-    payment_url: 'https://www.palpay.com.br/',
-    type: 'payment',
-    payment_method: {
-      code: 'banking_billet',
-      name: 'Boleto Bancário'
-    },
-    label: 'Boleto Bancário',
-    expiration_date: appData.expiration_date || 14
+  if (hasProtectedCard) {
+    const oAuth2ProtectedCard = new OAuth2ProtectedCard(
+      appData.protected_card.client_id,
+      appData.protected_card.client_secret,
+      storeId,
+      isSandbox
+    )
+
+    await oAuth2ProtectedCard.preparing
+    accessTokenProtectedCard = await oAuth2ProtectedCard.accessToken
+  }
+
+  const response = {
+    payment_gateways: []
+  }
+
+  // setup payment gateway objects
+  const intermediator = {
+    name: 'Braspag',
+    link: 'https://braspag.github.io/',
+    code: 'braspag'
+  }
+
+  const listPaymentMethod = ['credit_card', 'banking_billet', 'account_deposit']
+
+  listPaymentMethod.forEach(async paymentMethod => {
+    const isPix = paymentMethod === 'account_deposit'
+    const isCreditCard = paymentMethod === 'credit_card'
+    const methodConfig = appData[paymentMethod] || {}
+    const methodEnable = !methodConfig.disable
+
+    const minAmount = methodConfig?.min_amount || 0
+    const validateAmount = amount.total ? (amount.total >= minAmount) : true // Workaround for showcase
+    if (methodEnable && validateAmount) {
+      let label = methodConfig.label
+      if (!label) {
+        if (isCreditCard) {
+          label = 'Cartão de crédito'
+        } else {
+          label = !isPix ? 'Boleto bancário' : 'Pix'
+        }
+      }
+      const gateway = {
+        label,
+        icon: methodConfig.icon,
+        text: methodConfig.text,
+        payment_method: {
+          code: paymentMethod,
+          name: `${label} - ${intermediator.name}`
+        },
+        // type,
+        intermediator
+      }
+
+      const discount = appData.discount
+
+      if (discount[paymentMethod]) {
+        gateway.discount = {
+          apply_at: discount.apply_at,
+          type: discount.type,
+          value: discount.value
+        }
+
+        // check amount value to apply discount
+        if (amount.total < (discount.min_amount || 0)) {
+          delete gateway.discount
+        } else {
+          delete discount.min_amount
+
+          // fix local amount object
+          const applyDiscount = discount.apply_at
+
+          const maxDiscount = amount[applyDiscount || 'subtotal']
+          let discountValue
+          if (discount.type === 'percentage') {
+            discountValue = maxDiscount * discount.value / 100
+          } else {
+            discountValue = discount.value
+            if (discountValue > maxDiscount) {
+              discountValue = maxDiscount
+            }
+          }
+
+          if (discountValue) {
+            amount.discount = (amount.discount || 0) + discountValue
+            amount.total -= discountValue
+            if (amount.total < 0) {
+              amount.total = 0
+            }
+          }
+        }
+        if (response.discount_option) {
+          response.discount_option.min_amount = discount.min_amount
+        }
+      }
+
+      if (isCreditCard && hasProtectedCard) {
+        if (!gateway.icon) {
+          // gateway.icon = `${hostingUri}/credit-card.png`
+        }
+        const merchantIdProtectedCard = appData.protected_card.merchant_id || appData.merchant_id
+
+        // https://braspag.github.io//manual/braspag-pagador
+        gateway.js_client = {
+          script_uri: `${hostingUri}/script_client.js`,
+          onload_expression: `window._braspagAccessToken="${accessTokenProtectedCard}";` +
+            `window._braspagMerchantIdProtectedCard="${merchantIdProtectedCard}";` +
+            `window._barspagIsSandbox=${isSandbox};` +
+              fs.readFileSync(path.join(__dirname, '../../../assets/dist/onload-expression.min.js'), 'utf8'),
+          cc_hash: {
+            function: '_braspagHashCard',
+            is_promise: true
+          }
+        }
+        const { installments } = appData
+        if (installments) {
+          // list all installment options and default one
+          addInstallments(amount, installments, gateway, response)
+        }
+      }
+      response.payment_gateways.push(gateway)
+    }
   })
-
-  */
-
   res.send(response)
 }
