@@ -26,16 +26,365 @@
     "brands": [],
     "categories": [],
     "customers": [],
-    "orders": [],
+    "orders": [
+      "GET"
+    ],
     "carts": [],
     "orders/fulfillments": [],
-    "orders/payments_history": [],
+    "orders/payments_history": [
+      "POST"
+    ],
     "products/quantity": [],
     "products/variations/quantity": [],
     "products/price": [],
     "products/variations/price": []
   },
-  "admin_settings": {},
+  "admin_settings": {
+    "merchant_id": {
+      "schema": {
+        "type": "string",
+        "maxLength": 255,
+        "title": "MerchantId",
+        "description": "MerchantId da API Pagador Braspag"
+      },
+      "hide": true
+    },
+    "merchant_key": {
+      "schema": {
+        "type": "string",
+        "maxLength": 255,
+        "title": "MerchantKey",
+        "description": "MerchantKey da API Pagador Braspag"
+      },
+      "hide": true
+    },
+    "protected_card": {
+      "schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "maxLength": 255,
+            "title": "ClientId",
+            "description": "ClientId do Cartão Protegido Braspag"
+          },
+          "client_secret": {
+            "type": "string",
+            "maxLength": 255,
+            "title": "ClientSecret",
+            "description": "ClientSecret do Cartão Protegido Braspag"
+          },
+          "merchant_id": {
+            "type": "string",
+            "maxLength": 255,
+            "title": "MerchantId",
+            "description": "MerchantId do Cartão Protegido Braspag"
+          }
+        },
+        "title": "Cartão de Protegido",
+        "description": "Configurações Básicas para do Cartão Protegido Braspag"
+      },
+      "hide": true
+    },
+    "credit_card": {
+      "schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "Simulado",
+              "Cielo30",
+              "Getnet",
+              "Rede2",
+              "GlobalPayments",
+              "Stone",
+              "Safra2",
+              "PagSeguro",
+              "FirstData",
+              "Sub1",
+              "Banorte",
+              "Credibanco2",
+              "Transbank2",
+              "Banese",
+              "BrasilCard",
+              "CredSystem",
+              "Credz",
+              "DMCard"
+            ],
+            "default": "Cielo30",
+            "title": "Provedor",
+            "description": "Código do provedor do cartão de crédito"
+          },
+          "disable": {
+            "type": "boolean",
+            "title": "Desabilitar cartão",
+            "description": "Desabilitar pagamento com cartão via Braspag"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 50,
+            "title": "Rótulo",
+            "description": "Nome da forma de pagamento exibido para os clientes",
+            "default": "Cartão de crédito"
+          },
+          "min_amount": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 999999999,
+            "title": "Pedido mínimo",
+            "default": 0,
+            "description": "Montante mínimo para listar meio de pagamento via cartão de crédito"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Descrição",
+            "description": "Texto auxiliar sobre a forma de pagamento, pode conter tags HTML"
+          },
+          "icon": {
+            "type": "string",
+            "maxLength": 255,
+            "format": "uri",
+            "title": "Ícone",
+            "description": "Ícone customizado para a forma de pagamento, URL da imagem"
+          }
+        },
+        "title": "Cartão de crédito",
+        "description": "Configurações adicionais para cartão de crédito"
+      },
+      "hide": false
+    },
+    "installments": {
+      "schema": {
+        "type": "object",
+        "required": [
+          "max_number"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "min_installment": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 99999999,
+            "default": 5,
+            "title": "Parcela mínima",
+            "description": "Valor mínimo da parcela"
+          },
+          "max_number": {
+            "type": "integer",
+            "minimum": 2,
+            "maximum": 999,
+            "title": "Máximo de parcelas",
+            "description": "Número máximo de parcelas"
+          },
+          "monthly_interest": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 9999,
+            "default": 0,
+            "title": "Juros mensais",
+            "description": "Taxa de juros mensal, zero para parcelamento sem juros"
+          },
+          "max_interest_free": {
+            "type": "integer",
+            "minimum": 2,
+            "maximum": 999,
+            "title": "Parcelas sem juros",
+            "description": "Mesclar parcelamento com e sem juros (ex.: até 3x sem juros e 12x com juros)"
+          },
+          "interest_free_min_amount": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 999999999,
+            "title": "Mínimo sem juros",
+            "description": "Montante mínimo para parcelamento sem juros"
+          }
+        },
+        "title": "Parcelamento",
+        "description": "Opções de parcelamento no cartão via Braspag"
+      },
+      "hide": false
+    },
+    "banking_billet": {
+      "schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "Simulado",
+              "Braspag",
+              "Bradesco2",
+              "BancoDoBrasil2",
+              "BancoDoBrasil3",
+              "ItauShopline",
+              "Itau2",
+              "Santander2",
+              "Caixa2",
+              "CitiBank2"
+            ],
+            "default": "Braspag",
+            "title": "Provedor",
+            "description": "Código do provedor do boleto"
+          },
+          "disable": {
+            "type": "boolean",
+            "title": "Desabilitar boleto",
+            "description": "Desabilitar pagamento com boleto bancário via Braspag"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 50,
+            "title": "Rótulo",
+            "description": "Nome da forma de pagamento exibido para os clientes",
+            "default": "Boleto bancário"
+          },
+          "min_amount": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 999999999,
+            "title": "Pedido mínimo",
+            "default": 0,
+            "description": "Montante mínimo para listar meio de pagamento via boleto bancário"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Descrição",
+            "description": "Texto auxiliar sobre a forma de pagamento, pode conter tags HTML"
+          },
+          "icon": {
+            "type": "string",
+            "maxLength": 255,
+            "format": "uri",
+            "title": "Ícone",
+            "description": "Ícone customizado para a forma de pagamento, URL da imagem"
+          },
+          "add_days": {
+            "type": "integer",
+            "default": 0,
+            "title": "Prazo",
+            "description": "Prazo em DIAS para o primeiro pagamento"
+          }
+        },
+        "title": "Boleto bancário",
+        "description": "Configurações adicionais para boleto bancário"
+      },
+      "hide": false
+    },
+    "account_deposit": {
+      "schema": {
+        "type": "object",
+        "title": "Pix",
+        "description": "Configurações adicionais para PIX.",
+        "additionalProperties": false,
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "Cielo30",
+              "Bradesco2"
+            ],
+            "default": "Cielo30",
+            "title": "Provedor",
+            "description": "Código do provedor do pix"
+          },
+          "disable": {
+            "type": "boolean",
+            "default": true,
+            "title": "Desabilitar Pix",
+            "description": "Desabilitar pagamento com Pix via Braspag"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 50,
+            "title": "Rótulo",
+            "description": "Nome da forma de pagamento exibido para os clientes",
+            "default": "Pix"
+          },
+          "min_amount": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 999999999,
+            "title": "Pedido mínimo",
+            "default": 0,
+            "description": "Montante mínimo para listar meio de pagamento via Pix"
+          }
+        }
+      },
+      "hide": false
+    },
+    "discount": {
+      "schema": {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "apply_at": {
+            "type": "string",
+            "enum": [
+              "total",
+              "subtotal"
+            ],
+            "default": "subtotal",
+            "title": "Aplicar desconto em",
+            "description": "Em qual valor o desconto deverá ser aplicado no checkout"
+          },
+          "min_amount": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 999999999,
+            "title": "Pedido mínimo",
+            "description": "Montante mínimo para aplicar o desconto"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "percentage",
+              "fixed"
+            ],
+            "default": "percentage",
+            "title": "Tipo de desconto",
+            "description": "Desconto com valor percentual ou fixo"
+          },
+          "value": {
+            "type": "number",
+            "minimum": -99999999,
+            "maximum": 99999999,
+            "title": "Valor do desconto",
+            "description": "Valor percentual ou fixo a ser descontado, dependendo to tipo configurado"
+          },
+          "banking_billet": {
+            "type": "boolean",
+            "default": true,
+            "title": "Desconto no boleto",
+            "description": "Habilitar desconto via boleto Braspag"
+          },
+          "credit_card": {
+            "type": "boolean",
+            "default": true,
+            "title": "Desconto no cartão",
+            "description": "Habilitar desconto com cartão de crédito via Braspag"
+          },
+          "account_deposit": {
+            "type": "boolean",
+            "default": true,
+            "title": "Desconto no Pix",
+            "description": "Habilitar desconto com Pix via Braspag"
+          }
+        },
+        "title": "Desconto",
+        "description": "Desconto a ser aplicado para pagamentos via Braspag"
+      },
+      "hide": false
+    }
+  },
   "auth_callback_uri": "https://us-central1-ecom-braspag.cloudfunctions.net/app/ecom/auth-callback",
   "version": "1.0.0"
 }
