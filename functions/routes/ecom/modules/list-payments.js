@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
-const { hostingUri, isSandbox } = require('../../../__env')
+const axios = require('axios')
+const { /* hostingUri, */ isSandbox } = require('../../../__env')
 const addInstallments = require('../../../lib/payments/add-payments')
 const OAuth2ProtectedCard = require('../../../lib/braspag/protected-card/get-auth')
 
@@ -25,6 +26,7 @@ exports.post = async ({ appSdk }, req, res) => {
 
   // merge all app options configured by merchant
   const appData = Object.assign({}, application.data, application.hidden_data)
+  const listPaymentMethod = ['banking_billet', 'account_deposit']
 
   if (!appData.merchant_id || !appData.merchant_key) {
     return res.status(409).send({
@@ -33,19 +35,36 @@ exports.post = async ({ appSdk }, req, res) => {
     })
   }
 
-  const hasProtectedCard = appData.protected_card && appData.protected_card.client_id && appData.protected_card.client_secret
-  let accessTokenProtectedCard
+  const hasProtectedCard = appData.braspag_admin && appData.braspag_admin.client_id && appData.braspag_admin.client_secret
+  let accessTokenSOP = 'sadasdsa'
+  const MerchantId = appData.merchant_id
 
   if (hasProtectedCard) {
     const oAuth2ProtectedCard = new OAuth2ProtectedCard(
-      appData.protected_card.client_id,
-      appData.protected_card.client_secret,
+      appData.braspag_admin.client_id,
+      appData.braspag_admin.client_secret,
       storeId,
       isSandbox
     )
 
-    await oAuth2ProtectedCard.preparing
-    accessTokenProtectedCard = await oAuth2ProtectedCard.accessToken
+    try {
+      await oAuth2ProtectedCard.preparing
+      const accessToken = await oAuth2ProtectedCard.accessToken
+      const urlAuthSOP = `https://transaction${isSandbox ? 'sandbox' : ''}.pagador.com.br/post/api/public/v2/accesstoken`
+
+      const headers = {
+        MerchantId,
+        Authorization: `Bearer ${accessToken}`,
+        'content-type': 'application/json'
+      }
+      const { data } = await axios.post(urlAuthSOP, {}, { headers })
+
+      accessTokenSOP = data.AccessToken
+
+      listPaymentMethod.push('credit_card')
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   const response = {
@@ -58,8 +77,6 @@ exports.post = async ({ appSdk }, req, res) => {
     link: 'https://braspag.github.io/',
     code: 'braspag'
   }
-
-  const listPaymentMethod = ['credit_card', 'banking_billet', 'account_deposit']
 
   listPaymentMethod.forEach(async paymentMethod => {
     const isPix = paymentMethod === 'account_deposit'
@@ -132,17 +149,15 @@ exports.post = async ({ appSdk }, req, res) => {
         }
       }
 
-      if (isCreditCard && hasProtectedCard) {
+      if (isCreditCard) {
         if (!gateway.icon) {
           // gateway.icon = `${hostingUri}/credit-card.png`
         }
-        const merchantIdProtectedCard = appData.protected_card.merchant_id || appData.merchant_id
 
         // https://braspag.github.io//manual/braspag-pagador
         gateway.js_client = {
-          script_uri: `${hostingUri}/script_client.js`,
-          onload_expression: `window._braspagAccessToken="${accessTokenProtectedCard}";` +
-            `window._braspagMerchantIdProtectedCard="${merchantIdProtectedCard}";` +
+          script_uri: 'https://www.pagador.com.br/post/scripts/silentorderpost-1.0.min.js',
+          onload_expression: `window._braspagAccessToken="${accessTokenSOP}";` +
             `window._barspagIsSandbox=${isSandbox};` +
               fs.readFileSync(path.join(__dirname, '../../../assets/dist/onload-expression.min.js'), 'utf8'),
           cc_hash: {

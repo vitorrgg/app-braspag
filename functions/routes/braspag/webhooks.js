@@ -1,11 +1,11 @@
 // REF.: // https://braspag.github.io//manual/braspag-pagador#post-de-notifica%C3%A7%C3%A3o
-const getAppData = require('../../../lib/store-api/get-app-data')
-const axios = require('../../../lib/braspag/create-axios')
-const { parseStatus } = require('../../../lib/braspag/parse-utils')
+const getAppData = require('../../lib/store-api/get-app-data')
+const axios = require('../../lib/braspag/create-axios')
+const { parseStatus } = require('../../lib/braspag/parse-utils')
 const {
   addPaymentHistory,
   getOrderIntermediatorTransactionId
-} = require('../../../lib/store-api/utils')
+} = require('../../lib/store-api/utils')
 
 exports.post = async ({ appSdk, admin }, req, res) => {
   const { body, query } = req
@@ -34,7 +34,8 @@ exports.post = async ({ appSdk, admin }, req, res) => {
 
       const order = await getOrderIntermediatorTransactionId(appSdk, storeId, body.PaymentId, auth)
       if (order) {
-        if (order.financial_status.current !== (parseStatus[payment.Status] || 'unknown')) {
+        const status = (parseStatus[payment.Status] || 'unknown')
+        if (order.financial_status.current !== status) {
           // updadte status
           const transaction = order.transactions.find(transaction => transaction.intermediator.transaction_id === body.PaymentId)
           console.log('>> Try add payment history')
@@ -42,27 +43,28 @@ exports.post = async ({ appSdk, admin }, req, res) => {
           let notificationCode = `${type};${payment.type};`
           if ((parseStatus[payment.Status] === 'refunded' || parseStatus[payment.Status] === 'voided') &&
             payment?.VoidedDate) {
-            dateTime = new Date(`${payment?.VoidedDate} UTC+0`).toISOString()
+            dateTime = new Date(`${payment?.VoidedDate} UTC-3`).toISOString()
             notificationCode += `${dateTime};`
           } else if (payment.CapturedDate && parseStatus[payment.Status] === 'paid') {
-            dateTime = new Date(`${payment?.CapturedDate} UTC+0`).toISOString()
+            dateTime = new Date(`${payment?.CapturedDate} UTC-3`).toISOString()
             notificationCode += `${dateTime};`
           }
 
           const bodyPaymentHistory = {
             date_time: dateTime,
-            status: parseStatus[payment.Status] || 'unknown',
+            status: status,
             notification_code: notificationCode,
             flags: ['Braspag']
           }
           if (transaction && transaction._id) {
             bodyPaymentHistory.transaction_id = transaction._id
           }
+          // console.log('>> ', dateTime, ' ', payment?.CapturedDate,  ' ',  payment?.VoidedDate)
           await addPaymentHistory(appSdk, storeId, order._id, auth, bodyPaymentHistory)
-          console.log('>> Status update to paid')
+          console.log(`>> Status update to ${status}`)
           return res.sendStatus(200)
         } else {
-          console.log(`Status is ${parseStatus[payment.Status] || 'unknown'}`)
+          console.log(`Status is ${status}`)
           return res.sendStatus(200)
         }
       } else {

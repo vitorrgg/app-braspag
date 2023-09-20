@@ -70,7 +70,6 @@ exports.post = async ({ appSdk, admin }, req, res) => {
         updated_at: new Date().toISOString()
       }
     } else {
-      // account_deposit
       intermediator.transaction_id = payment.PaymentId
       intermediator.transaction_reference = payment.ProofOfSale
       intermediator.transaction_code = payment.AcquirerTransactionId
@@ -82,11 +81,6 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       await collectionQrCode.doc(orderId).set({ qrCode: qrCodeBase64 })
 
       const qrCodeSrc = `${baseUri}/qr-code?orderId=${orderId}`
-
-      // payment.SentOrderId
-      // payment.Status
-      // payment.ProviderReturnCode
-      // payment.ProviderReturnMessage
 
       transaction.notes = '<div style="display:block;margin:0 auto"> ' +
             `<img src="${qrCodeSrc}" style="display:block;margin:0 auto; width:150px;"> ` +
@@ -101,7 +95,6 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       }
     }
 
-    console.log('>> ', intermediator)
     transaction.intermediator = intermediator
 
     res.send({

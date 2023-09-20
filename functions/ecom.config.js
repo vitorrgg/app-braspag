@@ -156,7 +156,7 @@ const app = {
       },
       hide: true
     },
-    protected_card: {
+    braspag_admin: {
       schema: {
         type: 'object',
         additionalProperties: false,
@@ -165,23 +165,17 @@ const app = {
             type: 'string',
             maxLength: 255,
             title: 'ClientId',
-            description: 'ClientId do Cartão Protegido Braspag'
+            description: 'ClientId do Silent Order Post'
           },
           client_secret: {
             type: 'string',
             maxLength: 255,
             title: 'ClientSecret',
-            description: 'ClientSecret do Cartão Protegido Braspag',
+            description: 'ClientSecret do Silent Order Post',
           },
-          merchant_id: {
-            type: 'string',
-            maxLength: 255,
-            title: 'MerchantId',
-            description: 'MerchantId do Cartão Protegido Braspag',
-          }
         },
-        title: 'Cartão de Protegido',
-        description: 'Configurações Básicas para do Cartão Protegido Braspag'
+        title: 'Silent Order Post',
+        description: 'Credenciais do Silent Order Post (SOP) necessárias para habilitar pagamento via cartão'
       },
       hide: true
     },

@@ -10,7 +10,7 @@ module.exports = (merchantId, merchantKey, isQuery) => {
   }
 
   const url = `api${isQuery ? 'query' : ''}${isSandbox ? 'sandbox' : ''}`
-  console.log('>BaseUrl: ', url, ' version: ', version)
+  // console.log('>BaseUrl: ', url, ' version: ', version)
 
   return axios.create({
     baseURL: `https://${url}.braspag.com.br/${version}`,

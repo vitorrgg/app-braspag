@@ -29,7 +29,7 @@ module.exports = (appData, orderId, params, methodPayment) => {
       {
         Installments: installmentsNumber,
         CreditCard: {
-          Alias: hashCard.Alias
+          PaymentToken: hashCard.token
         }
       }
     )

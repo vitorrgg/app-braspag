@@ -1,3 +1,6 @@
-# My Awesome E-Com Plus App
+# Braspag
 
-Somethings about my app and what it does...
+Pagamento via cartão de crédito, boleto ou pix.
+
+***Obs.:***
+Necessárias credenciais para *API Pagador* e *Silent Order Post* do Braspag
