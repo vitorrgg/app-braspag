@@ -19,10 +19,10 @@ module.exports = function (clientId, clientSecret, storeId, isSandbox = false, f
     }
 
     const handleAuth = (isSandbox) => {
-      console.log(`> Protected Card Braspag Auth #${storeId} ${isSandbox ? 'SandBox' : ''}`)
+      console.log(`> Admin Braspag Auth #${storeId} ${isSandbox ? 'SandBox' : ''}`)
       auth(hashLogin, isSandbox, storeId)
         .then((data) => {
-          console.log(`> Protected Card Braspag ${JSON.stringify(data)}`)
+          console.log(`> Admin Braspag ${JSON.stringify(data)}`)
           authenticate(data.access_token)
           if (documentRef) {
             documentRef.set({

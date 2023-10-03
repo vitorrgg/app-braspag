@@ -3,7 +3,7 @@ const path = require('path')
 const axios = require('axios')
 const { /* hostingUri, */ isSandbox } = require('../../../__env')
 const addInstallments = require('../../../lib/payments/add-payments')
-const OAuth2ProtectedCard = require('../../../lib/braspag/protected-card/get-auth')
+const OAuth2AdminBraspag = require('../../../lib/braspag/admin/get-auth')
 
 exports.post = async ({ appSdk }, req, res) => {
   /**
@@ -35,12 +35,15 @@ exports.post = async ({ appSdk }, req, res) => {
     })
   }
 
-  const hasProtectedCard = appData.braspag_admin && appData.braspag_admin.client_id && appData.braspag_admin.client_secret
-  let accessTokenSOP = 'sadasdsa'
+  const haveCredentialsAdmin = appData.braspag_admin 
+    && appData.braspag_admin.client_id 
+    && appData.braspag_admin.client_secret
+
+  let accessTokenSOP
   const MerchantId = appData.merchant_id
 
-  if (hasProtectedCard) {
-    const oAuth2ProtectedCard = new OAuth2ProtectedCard(
+  if (haveCredentialsAdmin) {
+    const oAuth2AdminBraspag = new OAuth2AdminBraspag(
       appData.braspag_admin.client_id,
       appData.braspag_admin.client_secret,
       storeId,
@@ -48,8 +51,8 @@ exports.post = async ({ appSdk }, req, res) => {
     )
 
     try {
-      await oAuth2ProtectedCard.preparing
-      const accessToken = await oAuth2ProtectedCard.accessToken
+      await oAuth2AdminBraspag.preparing
+      const accessToken = await oAuth2AdminBraspag.accessToken
       const urlAuthSOP = `https://transaction${isSandbox ? 'sandbox' : ''}.pagador.com.br/post/api/public/v2/accesstoken`
 
       const headers = {
@@ -150,9 +153,11 @@ exports.post = async ({ appSdk }, req, res) => {
       }
 
       if (isCreditCard) {
+        /*
         if (!gateway.icon) {
-          // gateway.icon = `${hostingUri}/credit-card.png`
+          gateway.icon = `${hostingUri}/credit-card.png`
         }
+        */
 
         // https://braspag.github.io//manual/braspag-pagador
         gateway.js_client = {
