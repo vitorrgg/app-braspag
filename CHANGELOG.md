@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.0.0 (2023-10-03)
+
+
+### Features
+
+* **braspag:** create app ([96f9023](https://github.com/ecomplus/application-starter/commit/96f9023ce192a95289012aa9c8c5e4e644ade1c7))
+
+
+### Bug Fixes
+
+* **braspag:** update credit card tokenization ([2f296b4](https://github.com/ecomplus/application-starter/commit/2f296b424aa7981ab8d09a3a8d5cc36d18fa0541))
+* **list payment:** rename protected card roles to admin ([78b4db8](https://github.com/ecomplus/application-starter/commit/78b4db83b8d46431970893ef2f8abe58c5859ce2))
+
 ## [1.0.0-starter.26](https://github.com/ecomplus/application-starter/compare/v1.0.0-starter.25...v1.0.0-starter.26) (2022-02-24)
 
 ## [1.0.0-starter.25](https://github.com/ecomplus/application-starter/compare/v1.0.0-starter.24...v1.0.0-starter.25) (2022-02-24)
