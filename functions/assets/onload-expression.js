@@ -1,5 +1,5 @@
 ; (function () {
-  const isSandbox = window._barspagIsSandbox
+  const isSandbox = window._braspagIsSandbox
 
   const accessToken = window._braspagAccessToken
   // const merchantId = window._braspagMerchantIdProtectedCard

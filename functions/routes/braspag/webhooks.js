@@ -31,6 +31,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       const braspagAxios = axios(merchantId, merchantKey, true)
       const { data: { Payment: payment } } = await braspagAxios.get(`/sales/${body.PaymentId}`)
       let dateTime = new Date().toISOString()
+      console.log('>> payment ', JSON.stringify(payment))
 
       const order = await getOrderIntermediatorTransactionId(appSdk, storeId, body.PaymentId, auth)
       if (order) {
@@ -52,7 +53,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
 
           const bodyPaymentHistory = {
             date_time: dateTime,
-            status: status,
+            status,
             notification_code: notificationCode,
             flags: ['Braspag']
           }
@@ -68,7 +69,8 @@ exports.post = async ({ appSdk, admin }, req, res) => {
           return res.sendStatus(200)
         }
       } else {
-        return res.status(404).send({ message: `order with TransactionId #${body.PaymentId} not found` })
+        return res.status(404)
+          .send({ message: `order with TransactionId #${body.PaymentId} not found` })
       }
     }
   } catch (error) {

@@ -1,9 +1,8 @@
 const fs = require('fs')
 const path = require('path')
-const axios = require('axios')
 const { /* hostingUri, */ isSandbox } = require('../../../__env')
 const addInstallments = require('../../../lib/payments/add-payments')
-const OAuth2AdminBraspag = require('../../../lib/braspag/admin/get-auth')
+const TokenSOPBraspag = require('../../../lib/braspag/sop/get-access-token')
 
 exports.post = async ({ appSdk }, req, res) => {
   /**
@@ -35,36 +34,28 @@ exports.post = async ({ appSdk }, req, res) => {
     })
   }
 
-  const haveCredentialsAdmin = appData.braspag_admin 
-    && appData.braspag_admin.client_id 
-    && appData.braspag_admin.client_secret
+  const haveCredentialsAdmin = appData.braspag_admin &&
+    appData.braspag_admin.client_id &&
+    appData.braspag_admin.client_secret
 
   let accessTokenSOP
-  const MerchantId = appData.merchant_id
+  const merchantId = appData.merchant_id
 
   if (haveCredentialsAdmin) {
-    const oAuth2AdminBraspag = new OAuth2AdminBraspag(
+    const getTokenSOPBraspag = new TokenSOPBraspag(
       appData.braspag_admin.client_id,
       appData.braspag_admin.client_secret,
+      merchantId,
       storeId,
       isSandbox
     )
 
     try {
-      await oAuth2AdminBraspag.preparing
-      const accessToken = await oAuth2AdminBraspag.accessToken
-      const urlAuthSOP = `https://transaction${isSandbox ? 'sandbox' : ''}.pagador.com.br/post/api/public/v2/accesstoken`
-
-      const headers = {
-        MerchantId,
-        Authorization: `Bearer ${accessToken}`,
-        'content-type': 'application/json'
+      await getTokenSOPBraspag.preparing
+      accessTokenSOP = await getTokenSOPBraspag.accessToken
+      if (accessTokenSOP) {
+        listPaymentMethod.push('credit_card')
       }
-      const { data } = await axios.post(urlAuthSOP, {}, { headers })
-
-      accessTokenSOP = data.AccessToken
-
-      listPaymentMethod.push('credit_card')
     } catch (error) {
       console.error(error)
     }
@@ -163,7 +154,7 @@ exports.post = async ({ appSdk }, req, res) => {
         gateway.js_client = {
           script_uri: 'https://www.pagador.com.br/post/scripts/silentorderpost-1.0.min.js',
           onload_expression: `window._braspagAccessToken="${accessTokenSOP}";` +
-            `window._barspagIsSandbox=${isSandbox};` +
+            `window._braspagIsSandbox=${isSandbox};` +
               fs.readFileSync(path.join(__dirname, '../../../assets/dist/onload-expression.min.js'), 'utf8'),
           cc_hash: {
             function: '_braspagHashCard',

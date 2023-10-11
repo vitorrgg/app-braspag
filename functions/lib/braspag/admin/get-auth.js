@@ -1,6 +1,6 @@
 const auth = require('./create-auth')
 
-module.exports = function (clientId, clientSecret, storeId, isSandbox = false, firestoreColl = 'braspag_protected_card') {
+module.exports = function (clientId, clientSecret, storeId, isSandbox = false, firestoreColl = 'braspag_admin') {
   const self = this
 
   let documentRef
@@ -20,7 +20,7 @@ module.exports = function (clientId, clientSecret, storeId, isSandbox = false, f
 
     const handleAuth = (isSandbox) => {
       console.log(`> Admin Braspag Auth #${storeId} ${isSandbox ? 'SandBox' : ''}`)
-      auth(hashLogin, isSandbox, storeId)
+      auth(hashLogin, isSandbox)
         .then((data) => {
           console.log(`> Admin Braspag ${JSON.stringify(data)}`)
           authenticate(data.access_token)
