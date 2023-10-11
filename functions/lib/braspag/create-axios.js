@@ -1,5 +1,5 @@
 const axios = require('axios')
-const isSandbox = require('../../__env')
+const { isSandbox } = require('../../__env')
 
 module.exports = (merchantId, merchantKey, isQuery) => {
   const version = 'v2'
