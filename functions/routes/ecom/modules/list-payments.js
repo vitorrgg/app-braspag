@@ -154,7 +154,7 @@ exports.post = async ({ appSdk }, req, res) => {
         gateway.js_client = {
           script_uri: 'https://www.pagador.com.br/post/scripts/silentorderpost-1.0.min.js',
           onload_expression: `window._braspagAccessToken="${accessTokenSOP}";` +
-            `window._braspagIsSandbox=${isSandbox};` +
+            `window._braspagIsSandbox=${isSandbox || appData.credit_card?.provider === 'Simulado'};` +
             fs.readFileSync(path.join(__dirname, '../../../assets/dist/onload-expression.min.js'), 'utf8'),
           cc_hash: {
             function: '_braspagHashCard',
