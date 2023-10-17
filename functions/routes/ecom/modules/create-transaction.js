@@ -34,8 +34,12 @@ exports.post = async ({ appSdk, admin }, req, res) => {
   const { merchant_id: merchantId, merchant_key: merchantKey } = appData
   const methodPayment = params.payment_method.code
 
+  //
+  const isSimulated = (methodPayment === 'credit_card' || methodPayment === 'banking_billet')
+    && appData[methodPayment]?.provider === 'Simulado'
+
   try {
-    const braspagAxios = axios(merchantId, merchantKey)
+    const braspagAxios = axios(merchantId, merchantKey, null, isSimulated)
     const body = bodyBraspag(appData, orderId, params, methodPayment)
     console.log('>> body ', JSON.stringify(body))
     const { data } = await braspagAxios.post('/sales', body)
@@ -83,9 +87,9 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       const qrCodeSrc = `${baseUri}/qr-code?orderId=${orderId}`
 
       transaction.notes = '<div style="display:block;margin:0 auto"> ' +
-            `<img src="${qrCodeSrc}" style="display:block;margin:0 auto; width:150px;"> ` +
-            `<input readonly type="text" id="pix-copy" value="${qrCode}" />` +
-            `<button type="button" class="btn btn-sm btn-light" onclick="let codePix = document.getElementById('pix-copy')
+        `<img src="${qrCodeSrc}" style="display:block;margin:0 auto; width:150px;"> ` +
+        `<input readonly type="text" id="pix-copy" value="${qrCode}" />` +
+        `<button type="button" class="btn btn-sm btn-light" onclick="let codePix = document.getElementById('pix-copy')
           codePix.select()
           document.execCommand('copy')">Copiar Pix</button></div>`
 

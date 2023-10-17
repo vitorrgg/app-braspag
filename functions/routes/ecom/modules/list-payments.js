@@ -47,7 +47,7 @@ exports.post = async ({ appSdk }, req, res) => {
       appData.braspag_admin.client_secret,
       merchantId,
       storeId,
-      isSandbox
+      isSandbox || appData.credit_card?.provider === 'Simulado'
     )
 
     try {
@@ -155,7 +155,7 @@ exports.post = async ({ appSdk }, req, res) => {
           script_uri: 'https://www.pagador.com.br/post/scripts/silentorderpost-1.0.min.js',
           onload_expression: `window._braspagAccessToken="${accessTokenSOP}";` +
             `window._braspagIsSandbox=${isSandbox};` +
-              fs.readFileSync(path.join(__dirname, '../../../assets/dist/onload-expression.min.js'), 'utf8'),
+            fs.readFileSync(path.join(__dirname, '../../../assets/dist/onload-expression.min.js'), 'utf8'),
           cc_hash: {
             function: '_braspagHashCard',
             is_promise: true
