@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/ecomplus/application-starter/compare/v1.0.0...v1.1.0) (2023-11-03)
+
+
+### Features
+
+* **cielo:** add configuration field to use the Cielo API ([d8cfce7](https://github.com/ecomplus/application-starter/commit/d8cfce7c8d178e3255ca5b28985496285482ae8e))
+
+
+### Bug Fixes
+
+* **brapag:** check provider is simulated ([5942d51](https://github.com/ecomplus/application-starter/commit/5942d51c9debf9748c7062af8235bfb4fbfd0d75))
+* **braspag:** fix request to get SOP token ([851b1e3](https://github.com/ecomplus/application-starter/commit/851b1e3556a9d1b45422c963325961035163a722))
+* **create axios:** fix import of sandbox variable ([bef12f1](https://github.com/ecomplus/application-starter/commit/bef12f164f4e0967a40fe61b16e7a0d4f450e3b3))
+* **list payments:** check the provider is simulated in on load ([12b986e](https://github.com/ecomplus/application-starter/commit/12b986ee01a5a7ab1b4a8bc21c893d46693f5eaf))
+
 ## 1.0.0 (2023-10-03)
 
 
