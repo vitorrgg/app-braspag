@@ -1,6 +1,6 @@
 const { parseAddress, parsePaymentType } = require('./parse-utils')
 
-module.exports = (appData, orderId, params, methodPayment) => {
+module.exports = (appData, orderId, params, methodPayment, isCielo) => {
   const { amount, buyer, to } = params
 
   const config = appData[methodPayment]
@@ -14,7 +14,6 @@ module.exports = (appData, orderId, params, methodPayment) => {
       IdentityType: buyer.registry_type.toUpperCase() === 'P' ? 'CPF' : 'CNPJ'
     },
     Payment: {
-      Provider: config.provider,
       Type: parsePaymentType[methodPayment] || 'CreditCard',
       Amount: (amount.total * 100)
     }
@@ -23,6 +22,10 @@ module.exports = (appData, orderId, params, methodPayment) => {
   if (methodPayment === 'credit_card') {
     const hashCard = JSON.parse(Buffer.from(params.credit_card.hash, 'base64'))
     const installmentsNumber = params.installments_number || 1
+
+    if (!isCielo) {
+      body.Payment.Provider = config.provider
+    }
 
     Object.assign(
       body.Payment,

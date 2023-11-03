@@ -38,7 +38,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
   try {
     const appName = isCielo ? 'Cielo' : 'Braspag'
     const appAxios = axios(merchantId, merchantKey, null, isSimulated, isCielo)
-    const body = bodyBraspag(appData, orderId, params, methodPayment)
+    const body = bodyBraspag(appData, orderId, params, methodPayment, isCielo)
     console.log(`>> body #${storeId} [${appName}]: ${JSON.stringify(body)}`)
     const { data } = await appAxios.post('/sales', body)
     console.log(`>> data #${storeId} [${appName}]: ${JSON.stringify(data)}`)
