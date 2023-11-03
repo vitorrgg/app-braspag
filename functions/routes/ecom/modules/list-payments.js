@@ -26,6 +26,14 @@ exports.post = async ({ appSdk }, req, res) => {
   // merge all app options configured by merchant
   const appData = Object.assign({}, application.data, application.hidden_data)
   const listPaymentMethod = ['banking_billet', 'account_deposit']
+  const providersCieloBanking = [
+    'Simulado',
+    'Bradesco2',
+    'BancoDoBrasil2',
+    'BancoDoBrasil3',
+  ]
+
+  const isCielo = appData.is_cielo
 
   if (!appData.merchant_id || !appData.merchant_key) {
     return res.status(409).send({
@@ -76,7 +84,13 @@ exports.post = async ({ appSdk }, req, res) => {
     const isPix = paymentMethod === 'account_deposit'
     const isCreditCard = paymentMethod === 'credit_card'
     const methodConfig = appData[paymentMethod] || {}
-    const methodEnable = !methodConfig.disable
+    let methodEnable = !methodConfig.disable
+
+    if (paymentMethod === 'banking_billet' && isCielo) {
+      // https://developercielo.github.io/manual/cielo-ecommerce#boleto
+      methodEnable = providersCieloBanking.includes(methodConfig.provider)
+      console.warn('Provider for banking billet not allowed for Cielo API')
+    }
 
     const minAmount = methodConfig?.min_amount || 0
     const validateAmount = amount.total ? (amount.total >= minAmount) : true // Workaround for showcase

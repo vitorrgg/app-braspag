@@ -3,7 +3,7 @@ const { parseAddress, parsePaymentType } = require('./parse-utils')
 module.exports = (appData, orderId, params, methodPayment, isCielo) => {
   const { amount, buyer, to } = params
 
-  const config = appData[methodPayment]
+  const methodConfig = appData[methodPayment]
 
   const Address = to && to.street ? parseAddress(to) : parseAddress(params.billing_address)
   const body = {
@@ -14,7 +14,7 @@ module.exports = (appData, orderId, params, methodPayment, isCielo) => {
       IdentityType: buyer.registry_type.toUpperCase() === 'P' ? 'CPF' : 'CNPJ'
     },
     Payment: {
-      Provider: config.provider,
+      Provider: methodConfig.provider,
       Type: parsePaymentType[methodPayment] || 'CreditCard',
       Amount: (amount.total * 100)
     }
@@ -39,6 +39,10 @@ module.exports = (appData, orderId, params, methodPayment, isCielo) => {
       }
     )
   } else if (methodPayment === 'account_deposit') {
+    if (isCielo) {
+      delete body.Payment.Provider
+    }
+
     Object.assign(body.Customer, { Address })
     Object.assign(body.Payment, { QrCodeExpiration: 86400 })
   }
