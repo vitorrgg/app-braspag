@@ -24,14 +24,18 @@ exports.post = async ({ appSdk, admin }, req, res) => {
     console.log(`>> webhook ${JSON.stringify(body)}, type:${type}, store: ${storeId}`)
     const auth = await appSdk.getAuth(storeId)
     const appData = await getAppData({ appSdk, storeId, auth })
-    const { merchant_id: merchantId, merchant_key: merchantKey } = appData
+    const { merchant_id: merchantId, merchant_key: merchantKey, is_cielo: isCielo } = appData
 
     if (type === 1) {
-      // Mudança de status do pagamento
-      const braspagAxios = axios(merchantId, merchantKey, true)
-      const { data: { Payment: payment } } = await braspagAxios.get(`/sales/${body.PaymentId}`)
+      // Payment status change
+      // const isSimulated = appData.credit_card?.provider === 'Simulado' &&
+      //   appData.banking_billet?.provider === 'Simulado'
+
+      const appName = isCielo ? 'Cielo' : 'Braspag'
+      const appAxios = axios(merchantId, merchantKey, true, false, isCielo)
+      const { data: { Payment: payment } } = await appAxios.get(`/sales/${body.PaymentId}`)
       let dateTime = new Date().toISOString()
-      console.log('>> payment ', JSON.stringify(payment))
+      console.log(`>> payment [${appName}]: ${JSON.stringify(payment)}`)
 
       const order = await getOrderIntermediatorTransactionId(appSdk, storeId, body.PaymentId, auth)
       if (order) {
@@ -55,7 +59,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
             date_time: dateTime,
             status,
             notification_code: notificationCode,
-            flags: ['Braspag']
+            flags: [appName]
           }
           if (transaction && transaction._id) {
             bodyPaymentHistory.transaction_id = transaction._id

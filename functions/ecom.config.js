@@ -34,13 +34,13 @@ const app = {
      * Triggered when listing payments, must return available payment methods.
      * Start editing `routes/ecom/modules/list-payments.js`
      */
-    list_payments:        { enabled: true },
+    list_payments: { enabled: true },
 
     /**
      * Triggered when order is being closed, must create payment transaction and return info.
      * Start editing `routes/ecom/modules/create-transaction.js`
      */
-    create_transaction:   { enabled: true },
+    create_transaction: { enabled: true },
   },
 
   /**
@@ -143,7 +143,7 @@ const app = {
         type: 'string',
         maxLength: 255,
         title: 'MerchantId',
-        description: 'MerchantId da API Pagador Braspag'
+        description: 'MerchantId da API Pagador Braspag/Cielo eCommerce'
       },
       hide: true
     },
@@ -152,9 +152,17 @@ const app = {
         type: 'string',
         maxLength: 255,
         title: 'MerchantKey',
-        description: 'MerchantKey da API Pagador Braspag'
+        description: 'MerchantKey da API Pagador Braspag/Cielo eCommerce'
       },
       hide: true
+    },
+    is_cielo: {
+      schema: {
+        type: 'boolean',
+        title: 'Api Cielo',
+        description: 'Utilizar API Cielo eCommerce'
+      },
+      hide: false
     },
     braspag_admin: {
       schema: {
@@ -184,7 +192,7 @@ const app = {
         type: 'object',
         additionalProperties: false,
         properties: {
-          provider:{
+          provider: {
             type: 'string',
             enum: [
               'Simulado',
@@ -213,7 +221,7 @@ const app = {
           disable: {
             type: 'boolean',
             title: 'Desabilitar cartão',
-            description: 'Desabilitar pagamento com cartão via Braspag'
+            description: 'Desabilitar pagamento com cartão via Braspag/Cielo eCommerce'
           },
           label: {
             type: 'string',
@@ -296,7 +304,7 @@ const app = {
           }
         },
         title: 'Parcelamento',
-        description: 'Opções de parcelamento no cartão via Braspag'
+        description: 'Opções de parcelamento no cartão via Braspag/Cielo eCommerce'
       },
       hide: false
     },
@@ -305,7 +313,7 @@ const app = {
         type: 'object',
         additionalProperties: false,
         properties: {
-          provider:{
+          provider: {
             type: 'string',
             enum: [
               'Simulado',
@@ -326,7 +334,7 @@ const app = {
           disable: {
             type: 'boolean',
             title: 'Desabilitar boleto',
-            description: 'Desabilitar pagamento com boleto bancário via Braspag'
+            description: 'Desabilitar pagamento com boleto bancário via Braspag/Cielo eCommerce'
           },
           label: {
             type: 'string',
@@ -375,7 +383,7 @@ const app = {
         description: 'Configurações adicionais para PIX.',
         additionalProperties: false,
         properties: {
-          provider:{
+          provider: {
             type: 'string',
             enum: [
               'Cielo30',
@@ -389,7 +397,7 @@ const app = {
             type: 'boolean',
             default: true,
             title: 'Desabilitar Pix',
-            description: 'Desabilitar pagamento com Pix via Braspag'
+            description: 'Desabilitar pagamento com Pix via Braspag/Cielo eCommerce'
           },
           label: {
             type: 'string',
@@ -456,23 +464,23 @@ const app = {
             type: 'boolean',
             default: true,
             title: 'Desconto no boleto',
-            description: 'Habilitar desconto via boleto Braspag'
+            description: 'Habilitar desconto via boleto'
           },
           credit_card: {
             type: 'boolean',
             default: true,
             title: 'Desconto no cartão',
-            description: 'Habilitar desconto com cartão de crédito via Braspag'
+            description: 'Habilitar desconto com cartão de crédito'
           },
           account_deposit: {
             type: 'boolean',
             default: true,
             title: 'Desconto no Pix',
-            description: 'Habilitar desconto com Pix via Braspag'
+            description: 'Habilitar desconto com Pix'
           }
         },
         title: 'Desconto',
-        description: 'Desconto a ser aplicado para pagamentos via Braspag'
+        description: 'Desconto a ser aplicado para pagamentos'
       },
       hide: false
     }

@@ -28,22 +28,20 @@ exports.post = async ({ appSdk, admin }, req, res) => {
 
   // indicates whether the buyer should be redirected to payment link right after checkout
   const redirectToPayment = false
-
   const orderId = params.order_id
 
-  const { merchant_id: merchantId, merchant_key: merchantKey } = appData
+  const { merchant_id: merchantId, merchant_key: merchantKey, is_cielo: isCielo } = appData
   const methodPayment = params.payment_method.code
-
-  //
-  const isSimulated = (methodPayment === 'credit_card' || methodPayment === 'banking_billet')
-    && appData[methodPayment]?.provider === 'Simulado'
+  const isSimulated = (methodPayment === 'credit_card' || methodPayment === 'banking_billet') &&
+    appData[methodPayment]?.provider === 'Simulado'
 
   try {
-    const braspagAxios = axios(merchantId, merchantKey, null, isSimulated)
+    const appName = isCielo ? 'Cielo' : 'Braspag'
+    const appAxios = axios(merchantId, merchantKey, null, isSimulated, isCielo)
     const body = bodyBraspag(appData, orderId, params, methodPayment)
-    console.log('>> body ', JSON.stringify(body))
-    const { data } = await braspagAxios.post('/sales', body)
-    console.log('>> data ', JSON.stringify(data))
+    console.log(`>> body #${storeId} [${appName}]: ${JSON.stringify(body)}`)
+    const { data } = await appAxios.post('/sales', body)
+    console.log(`>> data #${storeId} [${appName}]: ${JSON.stringify(data)}`)
 
     const payment = data.Payment
     const intermediator = {}
