@@ -34,7 +34,8 @@ module.exports = (appData, orderId, params, methodPayment, isCielo) => {
         Installments: installmentsNumber,
         CreditCard: {
           PaymentToken: hashCard.token
-        }
+        },
+        Capture: true
       }
     )
   } else if (methodPayment === 'account_deposit') {
