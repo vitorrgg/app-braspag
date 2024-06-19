@@ -26,6 +26,14 @@ exports.post = async ({ appSdk, admin }, req, res) => {
     amount: amount.total
   }
 
+  let docSOP
+  const firestoreColl = 'braspag_token_sop'
+  if (firestoreColl) {
+    docSOP = require('firebase-admin')
+      .firestore()
+      .doc(`${firestoreColl}/${storeId}`)
+  }
+
   // indicates whether the buyer should be redirected to payment link right after checkout
   const redirectToPayment = false
   const orderId = params.order_id
@@ -47,6 +55,11 @@ exports.post = async ({ appSdk, admin }, req, res) => {
     const intermediator = {}
 
     if (methodPayment === 'credit_card') {
+      // delete docSop can only be used once
+      if (docSOP) {
+        docSOP.delete()
+          .catch(console.error)
+      }
       intermediator.transaction_id = payment.PaymentId
       intermediator.transaction_reference = payment.ProofOfSale
       intermediator.transaction_code = payment.AcquirerTransactionId
