@@ -57,7 +57,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
     if (methodPayment === 'credit_card') {
       // delete docSop can only be used once
       if (docSOP) {
-        docSOP.delete()
+        await docSOP.delete()
           .catch(console.error)
       }
       intermediator.transaction_id = payment.PaymentId
@@ -117,6 +117,10 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       transaction
     })
   } catch (error) {
+    if (methodPayment === 'credit_card' && docSOP) {
+      // delete docSop can only be used once
+      await docSOP.delete().catch(console.error)
+    }
     console.log(error.response)
     // try to debug request error
     const errCode = 'BRASPAG_TRANSACTION_ERR'
