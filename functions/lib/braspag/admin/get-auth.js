@@ -24,10 +24,13 @@ module.exports = function (clientId, clientSecret, storeId, isSandbox = false, f
         .then((data) => {
           console.log(`> Admin Braspag ${JSON.stringify(data)}`)
           authenticate(data.access_token)
+          const expiresIn = Date.now() + data.expires_in
           if (documentRef) {
             documentRef.set({
               accessToken: data.access_token,
-              expiresIn: Date.now() + data.expires_in,
+              expiresIn,
+              expiresInToString: new Date(data.expires_in).toISOString(),
+              updated_at: new Date().toISOString(),
               isSandbox
             }).catch(console.error)
           }

@@ -65,9 +65,11 @@ module.exports = function (clientId, clientSecret, merchantId, storeId, isSandbo
         .then((data) => {
           console.log('> Braspag SOP Token Update')
           authenticate(data.accessToken)
+          const expiresInToString = new Date(data.expiresIn).toISOString()
           if (documentRef) {
             documentRef.set({
               ...data,
+              expiresInToString,
               updated_at: new Date().toISOString(),
               isSandbox
             })
