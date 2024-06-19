@@ -30,7 +30,7 @@ exports.post = async ({ appSdk }, req, res) => {
     'Simulado',
     'Bradesco2',
     'BancoDoBrasil2',
-    'BancoDoBrasil3',
+    'BancoDoBrasil3'
   ]
 
   const isCielo = appData.is_cielo
@@ -165,10 +165,23 @@ exports.post = async ({ appSdk }, req, res) => {
         */
 
         // https://braspag.github.io//manual/braspag-pagador
+
+        let baseScriptUri = 'https://www.pagador.com.br' // https://www.pagador.com.br/post/scripts/silentorderpost-1.0.min.js
+        const scriptIsSandBox = Boolean(isSandbox || appData.credit_card?.provider === 'Simulado')
+        if (isCielo) {
+          // https://developercielo.github.io/manual/cielo-ecommerce
+
+          // SANDBOX https://transactionsandbox.pagador.com.br/post/scripts/silentorderpost-1.0.min.js
+          // PRODUÇÃO https://transaction.cieloecommerce.cielo.com.br/post/scripts/silentorderpost-1.0.min.js
+          baseScriptUri = scriptIsSandBox
+            ? 'https://transactionsandbox.pagador.com.br'
+            : 'https://transaction.cieloecommerce.cielo.com.br'
+        }
+
         gateway.js_client = {
-          script_uri: 'https://www.pagador.com.br/post/scripts/silentorderpost-1.0.min.js',
+          script_uri: `${baseScriptUri}/post/scripts/silentorderpost-1.0.min.js`,
           onload_expression: `window._braspagAccessToken="${accessTokenSOP}";` +
-            `window._braspagIsSandbox=${isSandbox || appData.credit_card?.provider === 'Simulado'};` +
+            `window._braspagIsSandbox=${scriptIsSandBox};` +
             fs.readFileSync(path.join(__dirname, '../../../assets/dist/onload-expression.min.js'), 'utf8'),
           cc_hash: {
             function: '_braspagHashCard',

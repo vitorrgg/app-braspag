@@ -66,7 +66,11 @@ module.exports = function (clientId, clientSecret, merchantId, storeId, isSandbo
           console.log('> Braspag SOP Token Update')
           authenticate(data.accessToken)
           if (documentRef) {
-            documentRef.set({ ...data, updated_at: new Date().toISOString() })
+            documentRef.set({
+              ...data,
+              updated_at: new Date().toISOString(),
+              isSandbox
+            })
               .catch(console.error)
           }
         })

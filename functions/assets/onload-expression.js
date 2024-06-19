@@ -1,5 +1,6 @@
 ; (function () {
   const isSandbox = window._braspagIsSandbox
+  console.log('>> SOP: ', isSandbox)
 
   const accessToken = window._braspagAccessToken
   // const merchantId = window._braspagMerchantIdProtectedCard

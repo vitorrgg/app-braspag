@@ -27,7 +27,8 @@ module.exports = function (clientId, clientSecret, storeId, isSandbox = false, f
           if (documentRef) {
             documentRef.set({
               accessToken: data.access_token,
-              expiresIn: Date.now() + data.expires_in
+              expiresIn: Date.now() + data.expires_in,
+              isSandbox
             }).catch(console.error)
           }
         })
