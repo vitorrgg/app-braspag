@@ -136,7 +136,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       transaction
     })
   } catch (error) {
-    if (methodPayment === 'credit_card' && docSOP) {
+    if (docSOP) {
       // delete docSop can only be used once
       await docSOP.delete().catch(console.error)
     }
