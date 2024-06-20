@@ -41,7 +41,7 @@ module.exports = (appData, orderId, params, methodPayment, isCielo) => {
         FraudAnalysis: {
           Sequence: isAnalyseFirst ? 'AnalyseFirst' : 'AuthorizeFirst',
           SequenceCriteria: isAnalyseFirst ? 'Always' : (isAnalyseAlways ? 'Always' : 'OnSuccess'),
-          Provider: 'RedShield'
+          Provider: 'ClearSale'
         }
       }
     )

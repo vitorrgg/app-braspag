@@ -2,6 +2,7 @@ const { baseUri } = require('../../../__env')
 const axios = require('../../../lib/braspag/create-axios')
 const { parseStatus } = require('../../../lib/braspag/parse-utils')
 const bodyBraspag = require('../../../lib/braspag/payload-to-transaction')
+const addInstallments = require('../../../lib/payments/add-payments')
 exports.post = async ({ appSdk, admin }, req, res) => {
   /**
    * Requests coming from Modules API have two object properties on body: `params` and `application`.
@@ -64,6 +65,24 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       intermediator.transaction_reference = payment.ProofOfSale
       intermediator.transaction_code = payment.AcquirerTransactionId
       // `${payment.AuthorizationCode}`
+
+      if (payment.CreditCard?.Brand) {
+        transaction.credit_card = {
+          company: payment.CreditCard?.Brand
+        }
+      }
+
+      if (appData.installments) {
+        const installmentsNumber = params.installments_number || 1
+        // list all installment options
+        const { gateway } = addInstallments(amount.total, appData.installments)
+        const installmentOption = gateway.installment_options &&
+          gateway.installment_options.find(({ number }) => number === installmentsNumber)
+
+        if (installmentOption) {
+          transaction.installments = installmentOption
+        }
+      }
 
       transaction.status = {
         current: parseStatus[payment.Status] || 'unknown',
