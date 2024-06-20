@@ -156,6 +156,24 @@ const app = {
       },
       hide: true
     },
+    is_analyse_first: {
+      schema: {
+        type: 'boolean',
+        title: 'Análise antifraude primeiro',
+        default: false,
+        description: 'Se ativo, análisa antifraude antes de autorizar as transações'
+      },
+      hide: false
+    },
+    is_analyse_always:{
+      schema: {
+        type: 'boolean',
+        title: 'Análise antifraude em todas transações',
+        default: false,
+        description: 'Se ativo, análisa antifraude ocorre mesmos em transações rejeitadas.'
+      },
+      hide: false
+    },
     is_cielo: {
       schema: {
         type: 'boolean',

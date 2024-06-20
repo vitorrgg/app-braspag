@@ -28,6 +28,8 @@ module.exports = (appData, orderId, params, methodPayment, isCielo) => {
       delete body.Payment.Provider
     }
 
+    const isAnalyseFirst = Boolean(appData.is_analyse_first)
+    const isAnalyseAlways = Boolean(appData.is_analyse_always)
     Object.assign(
       body.Payment,
       {
@@ -35,7 +37,12 @@ module.exports = (appData, orderId, params, methodPayment, isCielo) => {
         CreditCard: {
           PaymentToken: hashCard.token
         },
-        Capture: true
+        Capture: true,
+        FraudAnalysis: {
+          Sequence: isAnalyseFirst ? 'AnalyseFirst' : 'AuthorizeFirst',
+          SequenceCriteria: isAnalyseFirst ? 'Always' : (isAnalyseAlways ? 'Always' : 'OnSuccess'),
+          Provider: 'RedShield'
+        }
       }
     )
   } else if (methodPayment === 'account_deposit') {
