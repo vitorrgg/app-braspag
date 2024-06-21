@@ -8,14 +8,17 @@
   newScript.innerHTML = elementScript
   document.head.appendChild(newScript)
   // const merchantId = window._braspagMerchantIdProtectedCard
+  const newScript2 = document.createElement('script')
+  newScript2.type = 'text/javascript'
+  newScript2.src = 'https://mpsnare.iesnare.com/snare.js'
+  document.appendChild(newScript2)
 
   // const script = '<script type=”text/javascript” src=”https://mpsnare.iesnare.com/snare.js”></script>'
   // document.appendChild(script)
-  // const elementsScript = '<input> type="hidden" name="gatewayFingerprint" id="gatewayFingerprint" </input>'
-  // const newForm = document.createElement('form')
-  // newForm.setAttribute('id', 'formBraspag')
-  // newForm.innerHTML = elementsScript
-  // document.body.appendChild(newForm)
+  const elementsScript = '<input> type="hidden" name="gatewayFingerprint" id="gatewayFingerprint" </input>'
+  const newForm = document.createElement('form')
+  newForm.innerHTML = elementsScript
+  document.body.appendChild(newForm)
 
   window._braspagHashCard = async function (cardClient) {
     document.body.appendChild(newScript)
