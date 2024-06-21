@@ -11,7 +11,7 @@
   const newScript2 = document.createElement('script')
   newScript2.type = 'text/javascript'
   newScript2.src = 'https://mpsnare.iesnare.com/snare.js'
-  document.appendChild(newScript2)
+  document.append(newScript2)
 
   // const script = '<script type=”text/javascript” src=”https://mpsnare.iesnare.com/snare.js”></script>'
   // document.appendChild(script)
