@@ -32,7 +32,6 @@ const parseFraudAnalysis = (appData, params, Address, fingerPrintId) => {
   }
   return fraudAnalysis
 }
-// */
 
 module.exports = (appData, orderId, params, methodPayment, isCielo) => {
   const { amount, buyer, to } = params
@@ -45,7 +44,8 @@ module.exports = (appData, orderId, params, methodPayment, isCielo) => {
     Customer: {
       Name: buyer.fullname,
       Identity: buyer.doc_number,
-      IdentityType: buyer.registry_type.toUpperCase() === 'P' ? 'CPF' : 'CNPJ'
+      IdentityType: buyer.registry_type.toUpperCase() === 'P' ? 'CPF' : 'CNPJ',
+      Address
     },
     Payment: {
       Provider: methodConfig.provider,
@@ -61,6 +61,22 @@ module.exports = (appData, orderId, params, methodPayment, isCielo) => {
     if (isCielo) {
       delete body.Payment.Provider
     }
+
+    if (buyer.email) {
+      Object.assign(body.Customer, { Email: buyer.email })
+    }
+
+    if (params.birth_date) {
+      const { day, month, year } = params.birth_date
+      const Birthdate = `${year}-``${month}`.padStart(2, '0')`-``${day}`.padStart(2, '0')``
+      Object.assign(body.Customer, { Birthdate })
+    }
+
+    if (params.browser_ip) {
+      Object.assign(body.Customer, { IpAddress: params.browser_ip })
+    }
+
+    Object.assign(body.Customer, { DeliveryAddress: Address })
 
     Object.assign(
       body.Payment,
@@ -79,10 +95,6 @@ module.exports = (appData, orderId, params, methodPayment, isCielo) => {
     }
 
     Object.assign(body.Payment, { QrCodeExpiration: 86400 })
-  }
-
-  if (methodPayment === 'banking_billet' || methodPayment === 'account_deposit') {
-    Object.assign(body.Customer, { Address })
   }
 
   return body
