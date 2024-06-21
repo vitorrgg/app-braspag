@@ -78,8 +78,11 @@ module.exports = (appData, orderId, params, methodPayment, isCielo) => {
       delete body.Payment.Provider
     }
 
-    Object.assign(body.Customer, { Address })
     Object.assign(body.Payment, { QrCodeExpiration: 86400 })
+  }
+
+  if (methodPayment === 'banking_billet' || methodPayment === 'account_deposit') {
+    Object.assign(body.Customer, { Address })
   }
 
   return body
