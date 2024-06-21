@@ -13,12 +13,13 @@
   newScript2.src = 'https://mpsnare.iesnare.com/snare.js'
   document.head.append(newScript2)
 
-  // const script = '<script type=”text/javascript” src=”https://mpsnare.iesnare.com/snare.js”></script>'
-  // document.appendChild(script)
   const elementsScript = '<input type="hidden" name="gatewayFingerprint" id="gatewayFingerprint"> </input>'
   const newForm = document.createElement('form')
   newForm.innerHTML = elementsScript
   document.body.appendChild(newForm)
+
+  const gatewayFingerprint = document.getElementById('gatewayFingerprint').value
+  console.log('>>> value ', gatewayFingerprint)
 
   window._braspagHashCard = async function (cardClient) {
     document.body.appendChild(newScript)
