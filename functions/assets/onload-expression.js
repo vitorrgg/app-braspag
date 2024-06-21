@@ -5,13 +5,6 @@
   const accessToken = window._braspagAccessToken
   // const merchantId = window._braspagMerchantIdProtectedCard
 
-  const newScript = `
-  <script> 
-    var io_bbout_element_id = "gatewayFingerprint";
-  </script> 
-  `
-  document.body.appendChild(newScript)
-
   // const script = '<script type=”text/javascript” src=”https://mpsnare.iesnare.com/snare.js”></script>'
   // document.appendChild(script)
   // const elementsScript = '<input> type="hidden" name="gatewayFingerprint" id="gatewayFingerprint" </input>'
@@ -21,6 +14,12 @@
   // document.body.appendChild(newForm)
 
   window._braspagHashCard = async function (cardClient) {
+    const newScript = `
+    <script> 
+      var io_bbout_element_id = "gatewayFingerprint";
+    </script> 
+    `
+    document.body.appendChild(newScript)
     const elementsForm = `
     <input type="text" class="bp-sop-cardtype" value="creditCard" style="display: none;>
     <input type="text" class="bp-sop-cardcvvc" value="${cardClient.cvc}" style="display: none;">
