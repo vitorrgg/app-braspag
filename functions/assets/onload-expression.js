@@ -34,7 +34,7 @@
     document.body.appendChild(newForm)
 
     const fingerPrintId = document.getElementById('gatewayFingerprint').value
-    console.log('>>> value2 ', fingerPrintId)
+
     return new Promise(async function (resolve, reject) {
       const options = {
         accessToken,

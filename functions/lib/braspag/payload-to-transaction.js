@@ -1,4 +1,38 @@
 const { parseAddress, parsePaymentType } = require('./parse-utils')
+// /*
+const parseFraudAnalysis = (appData, params, Address, fingerPrintId) => {
+  const { amount, buyer, items } = params
+  const isAnalyseFirst = Boolean(appData.is_analyse_first)
+  const isAnalyseAlways = Boolean(appData.is_analyse_always)
+  const fraudAnalysis = {
+    Sequence: isAnalyseFirst ? 'AnalyseFirst' : 'AuthorizeFirst',
+    SequenceCriteria: isAnalyseFirst ? 'Always' : (isAnalyseAlways ? 'Always' : 'OnSuccess'),
+    Provider: 'ClearSale',
+    TotalOrderAmount: (amount.total * 100),
+    FingerPrintId: fingerPrintId,
+    Shipping: {
+      Addressee: buyer.fullname,
+      Method: 'Other',
+      Identity: buyer.doc_number,
+      IdentityType: buyer.registry_type.toUpperCase() === 'P' ? '1' : '2',
+      ...Address
+    },
+    Cart: {
+      ReturnsAccepted: true,
+      Items: items.map(item => {
+        return {
+          Name: item.name || item.variation_id || item.product_id,
+          Quantity: item.quantity,
+          Sku: item.sku,
+          UnitPrice: Math.floor((item.final_price || item.price) * 100),
+          Type: 'Default'
+        }
+      })
+    }
+  }
+  return fraudAnalysis
+}
+// */
 
 module.exports = (appData, orderId, params, methodPayment, isCielo) => {
   const { amount, buyer, to } = params
@@ -28,8 +62,6 @@ module.exports = (appData, orderId, params, methodPayment, isCielo) => {
       delete body.Payment.Provider
     }
 
-    const isAnalyseFirst = Boolean(appData.is_analyse_first)
-    const isAnalyseAlways = Boolean(appData.is_analyse_always)
     Object.assign(
       body.Payment,
       {
@@ -38,11 +70,7 @@ module.exports = (appData, orderId, params, methodPayment, isCielo) => {
           PaymentToken: hashCard.token
         },
         Capture: true,
-        FraudAnalysis: {
-          Sequence: isAnalyseFirst ? 'AnalyseFirst' : 'AuthorizeFirst',
-          SequenceCriteria: isAnalyseFirst ? 'Always' : (isAnalyseAlways ? 'Always' : 'OnSuccess'),
-          Provider: 'ClearSale'
-        }
+        FraudAnalysis: parseFraudAnalysis(appData, params, Address, hashCard.fingerPrintId)
       }
     )
   } else if (methodPayment === 'account_deposit') {
