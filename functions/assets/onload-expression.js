@@ -10,7 +10,7 @@
     var io_bbout_element_id = "gatewayFingerprint";
   </script> 
   `
-  document.head.appendChild(newScript)
+  document.body.appendChild(newScript)
 
   // const script = '<script type=”text/javascript” src=”https://mpsnare.iesnare.com/snare.js”></script>'
   // document.appendChild(script)
