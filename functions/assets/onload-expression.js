@@ -18,8 +18,8 @@
   newForm.innerHTML = elementsScript
   document.body.appendChild(newForm)
 
-  const gatewayFingerprint = document.getElementById('gatewayFingerprint').value
-  console.log('>>> value ', gatewayFingerprint)
+  const fingerPrintId = document.getElementById('gatewayFingerprint')
+  console.log('>>> value ', fingerPrintId)
 
   window._braspagHashCard = async function (cardClient) {
     document.body.appendChild(newScript)
@@ -34,15 +34,17 @@
     const newForm = document.createElement('form')
     newForm.setAttribute('id', 'formBraspag')
     newForm.innerHTML = elementsForm
-
     document.body.appendChild(newForm)
+
+    const fingerPrintId = document.getElementById('gatewayFingerprint')
+    console.log('>>> value2 ', fingerPrintId)
     return new Promise(async function (resolve, reject) {
       const options = {
         accessToken,
         onSuccess: function (response) {
           console.log('>', response)
           if (response.PaymentToken) {
-            const data = JSON.stringify({ token: response.PaymentToken })
+            const data = JSON.stringify({ token: response.PaymentToken, fingerPrintId })
             resolve(window.btoa(data))
           } else {
             const error = new Error('PaymentToken not found')
