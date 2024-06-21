@@ -15,7 +15,7 @@
 
   // const script = '<script type=”text/javascript” src=”https://mpsnare.iesnare.com/snare.js”></script>'
   // document.appendChild(script)
-  const elementsScript = '<input> type="hidden" name="gatewayFingerprint" id="gatewayFingerprint" </input>'
+  const elementsScript = '<input type="hidden" name="gatewayFingerprint" id="gatewayFingerprint"> </input>'
   const newForm = document.createElement('form')
   newForm.innerHTML = elementsScript
   document.body.appendChild(newForm)
