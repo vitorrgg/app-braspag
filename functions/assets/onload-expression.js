@@ -18,9 +18,6 @@
   newForm.innerHTML = elementsScript
   document.body.appendChild(newForm)
 
-  const fingerPrintId = document.getElementById('gatewayFingerprint')
-  console.log('>>> value ', fingerPrintId)
-
   window._braspagHashCard = async function (cardClient) {
     document.body.appendChild(newScript)
     const elementsForm = `
@@ -36,7 +33,7 @@
     newForm.innerHTML = elementsForm
     document.body.appendChild(newForm)
 
-    const fingerPrintId = document.getElementById('gatewayFingerprint')
+    const fingerPrintId = document.getElementById('gatewayFingerprint').value
     console.log('>>> value2 ', fingerPrintId)
     return new Promise(async function (resolve, reject) {
       const options = {
