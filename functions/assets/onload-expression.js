@@ -3,6 +3,10 @@
   console.log('>> SOP: ', isSandbox)
 
   const accessToken = window._braspagAccessToken
+  const elementScript = 'var io_bbout_element_id = "gatewayFingerprint";'
+  const newScript = document.createElement('script')
+  newScript.innerHTML = elementScript
+  document.head.appendChild(newScript)
   // const merchantId = window._braspagMerchantIdProtectedCard
 
   // const script = '<script type=”text/javascript” src=”https://mpsnare.iesnare.com/snare.js”></script>'
@@ -14,11 +18,6 @@
   // document.body.appendChild(newForm)
 
   window._braspagHashCard = async function (cardClient) {
-    const newScript = `
-    <script> 
-      var io_bbout_element_id = "gatewayFingerprint";
-    </script> 
-    `
     document.body.appendChild(newScript)
     const elementsForm = `
     <input type="text" class="bp-sop-cardtype" value="creditCard" style="display: none;>
