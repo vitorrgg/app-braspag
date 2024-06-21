@@ -39,7 +39,7 @@
       const options = {
         accessToken,
         onSuccess: function (response) {
-          console.log('>', response)
+          // console.log('>', response)
           if (response.PaymentToken) {
             const data = JSON.stringify({ token: response.PaymentToken, fingerPrintId })
             resolve(window.btoa(data))

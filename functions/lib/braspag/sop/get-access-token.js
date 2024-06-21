@@ -68,7 +68,9 @@ module.exports = function (clientId, clientSecret, merchantId, storeId, isSandbo
           const expiresInToString = new Date(data.expiresIn).toISOString()
           if (documentRef) {
             documentRef.set({
-              ...data,
+              accessToken: data.accessToken,
+              expiresIn: Date.now() + (2 * 60 * 1000),
+              // ...data,
               expiresInToString,
               updated_at: new Date().toISOString(),
               isSandbox
