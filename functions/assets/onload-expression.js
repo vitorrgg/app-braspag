@@ -7,7 +7,7 @@
 
   const newScript = `
   <script> 
-    var io_bbout_element_id = gatewayFingerprint;
+    var io_bbout_element_id = "gatewayFingerprint";
   </script> 
   `
   document.head.appendChild(newScript)
