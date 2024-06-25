@@ -10,7 +10,7 @@
     g = b.getElementsByTagName(c)[0]; f.async = 1; f.src = d; g.parentNode.insertBefore(f, g)
     })(window, document, 'script', '//device.clearsale.com.br/p/fp.js', 'csdp');
     csdp('app', 'seu_app');
-    csdp('outputsessionid', 'MeuCampoQueReceberaValor');`
+    csdp('outputsessionid', 'mySessionId');`
 
   const newScript = document.createElement('script')
   newScript.innerHTML = elementScript
@@ -26,10 +26,13 @@
   // newForm.innerHTML = elementsScript
   // document.body.appendChild(newForm)
 
-  const elementsScript = '<input type="hidden" id="MeuCampoQueReceberaValor" value=""/>'
+  const elementsScript = '<input type="hidden" id="mySessionId" value=""/>'
   const newForm = document.createElement('form')
   newForm.innerHTML = elementsScript
   document.body.appendChild(newForm)
+
+  const fingerPrintId = document.getElementById('mySessionId').value
+  console.log('>> id ', fingerPrintId)
 
   window._braspagHashCard = async function (cardClient) {
     document.body.appendChild(newScript)
@@ -46,7 +49,6 @@
     newForm.innerHTML = elementsForm
     document.body.appendChild(newForm)
 
-    const fingerPrintId = document.getElementById('gatewayFingerprint').value
 
     return new Promise(async function (resolve, reject) {
       const options = {
