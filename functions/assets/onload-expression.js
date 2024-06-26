@@ -34,7 +34,6 @@
   let fingerPrintId
   setTimeout(() => {
     fingerPrintId = document.getElementById('mySessionId').value
-    console.log('>> id ', fingerPrintId)
 
     const elementScript = `
     (function (a, b, c, d, e, f, g) {
@@ -46,7 +45,6 @@
       csdp('app', 'seu_app');
       csdp('sessionid', '${fingerPrintId}');`
 
-    console.log('>> elementScript ', elementScript)
     const newScript = document.createElement('script')
     newScript.innerHTML = elementScript
     document.body.appendChild(newScript)
@@ -68,7 +66,6 @@
     document.body.appendChild(newForm)
 
     return new Promise(async function (resolve, reject) {
-      console.log('>> pos id ', fingerPrintId)
       const options = {
         accessToken,
         onSuccess: function (response) {
