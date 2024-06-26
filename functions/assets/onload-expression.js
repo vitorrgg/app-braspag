@@ -46,6 +46,7 @@
       csdp('app', 'seu_app');
       csdp('sessionid', '${fingerPrintId}');`
 
+    console.log('>> elementScript ', elementScript)
     const newScript = document.createElement('script')
     newScript.innerHTML = elementScript
     document.body.appendChild(newScript)
