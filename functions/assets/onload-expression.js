@@ -31,9 +31,24 @@
   newForm.innerHTML = elementsScript
   document.body.appendChild(newForm)
 
+  let fingerPrintId
   setTimeout(() => {
-    const fingerPrintId = document.getElementById('mySessionId').value
+    fingerPrintId = document.getElementById('mySessionId').value
     console.log('>> id ', fingerPrintId)
+
+    const elementScript = `
+    (function (a, b, c, d, e, f, g) {
+      a['CsdpObject'] = e; a[e] = a[e] || function () {
+      (a[e].q = a[e].q || []).push(arguments)
+      }, a[e].l = 1 * Date.now(); f = b.createElement(c),
+      g = b.getElementsByTagName(c)[0]; f.async = 1; f.src = d; g.parentNode.insertBefore(f, g)
+      })(window, document, 'script', '//device.clearsale.com.br/p/fp.js', 'csdp');
+      csdp('app', 'seu_app');
+      csdp('sessionid', ${fingerPrintId});`
+
+    const newScript = document.createElement('script')
+    newScript.innerHTML = elementScript
+    document.body.appendChild(newScript)
   }, 100)
 
   window._braspagHashCard = async function (cardClient) {
@@ -52,6 +67,7 @@
     document.body.appendChild(newForm)
 
     return new Promise(async function (resolve, reject) {
+      console.log('>> pos id ', fingerPrintId)
       const options = {
         accessToken,
         onSuccess: function (response) {
