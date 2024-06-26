@@ -33,6 +33,20 @@ const parseFraudAnalysis = (appData, params, Address, fingerPrintId) => {
   return fraudAnalysis
 }
 
+const parsePhone = (phone) => {
+  const lengthPhone = phone.length
+  const ddd = phone.substring(0, 2)
+
+  if (lengthPhone > 9) {
+    const numberStart = phone.substring(2, lengthPhone - 4)
+    const numberEnd = phone.substring(lengthPhone - 4, lengthPhone)
+    return `${ddd} ${numberStart}-${numberEnd}`
+  } else {
+    const numberWitoutDDD = phone.substring(2, lengthPhone)
+    return `${ddd} ${numberWitoutDDD}`
+  }
+}
+
 module.exports = (appData, orderId, params, methodPayment, isCielo) => {
   const { amount, buyer, to } = params
 
@@ -67,8 +81,8 @@ module.exports = (appData, orderId, params, methodPayment, isCielo) => {
     }
 
     if (buyer.phone) {
-      let phone = buyer.phone.country_code ? `+${buyer.phonecountry_code}` : ''
-      phone += buyer.phone.number
+      let phone = buyer.phone.country_code ? `+${buyer.phonecountry_code}` : '+55'
+      phone += parsePhone(buyer.phone.number)
       Object.assign(body.Customer, { Phone: phone })
     }
 
