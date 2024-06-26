@@ -40,10 +40,10 @@ const parsePhone = (phone) => {
   if (lengthPhone > 9) {
     const numberStart = phone.substring(2, lengthPhone - 4)
     const numberEnd = phone.substring(lengthPhone - 4, lengthPhone)
-    return `${ddd} ${numberStart}-${numberEnd}`
+    return ` ${ddd} ${numberStart}-${numberEnd}`
   } else {
     const numberWitoutDDD = phone.substring(2, lengthPhone)
-    return `${ddd} ${numberWitoutDDD}`
+    return ` ${ddd} ${numberWitoutDDD}`
   }
 }
 
