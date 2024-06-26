@@ -1,30 +1,22 @@
 ; (function () {
   const isSandbox = window._braspagIsSandbox
-  console.log('>> SOP: ', isSandbox)
-
   const accessToken = window._braspagAccessToken
+  const fingerprintApp = window._braspagFingerprintApp
+
+  console.log(`>> SOP: ${isSandbox? 'SandBox' : ''}`, ' fingerprint', fingerprintApp)
+
   const elementScript = `(function (a, b, c, d, e, f, g) {
     a['CsdpObject'] = e; a[e] = a[e] || function () {
     (a[e].q = a[e].q || []).push(arguments)
     }, a[e].l = 1 * new Date(); f = b.createElement(c),
     g = b.getElementsByTagName(c)[0]; f.async = 1; f.src = d; g.parentNode.insertBefore(f, g)
     })(window, document, 'script', '//device.clearsale.com.br/p/fp.js', 'csdp');
-    csdp('app', 'seu_app');
+    csdp('app', '${fingerprintApp || 'seu_app'}');
     csdp('outputsessionid', 'mySessionId');`
 
   const newScript = document.createElement('script')
   newScript.innerHTML = elementScript
   document.head.appendChild(newScript)
-  // const merchantId = window._braspagMerchantIdProtectedCard
-  // const newScript2 = document.createElement('script')
-  // newScript2.type = 'text/javascript'
-  // newScript2.src = 'https://mpsnare.iesnare.com/snare.js'
-  // document.head.append(newScript2)
-
-  // const elementsScript = '<input type="hidden" name="gatewayFingerprint" id="gatewayFingerprint"> </input>'
-  // const newForm = document.createElement('form')
-  // newForm.innerHTML = elementsScript
-  // document.body.appendChild(newForm)
 
   const elementsScript = '<input type="hidden" id="mySessionId" value=""/>'
   const newForm = document.createElement('form')
@@ -42,7 +34,7 @@
       }, a[e].l = 1 * Date.now(); f = b.createElement(c),
       g = b.getElementsByTagName(c)[0]; f.async = 1; f.src = d; g.parentNode.insertBefore(f, g)
       })(window, document, 'script', '//device.clearsale.com.br/p/fp.js', 'csdp');
-      csdp('app', 'seu_app');
+      csdp('app', '${fingerprintApp || 'seu_app'}');
       csdp('sessionid', '${fingerPrintId}');`
 
     const newScript = document.createElement('script')

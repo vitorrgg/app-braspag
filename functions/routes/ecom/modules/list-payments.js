@@ -158,6 +158,7 @@ exports.post = async ({ appSdk }, req, res) => {
       }
 
       if (isCreditCard) {
+        const fingerprintApp = appData.credit_card?.fingerprint_app
         /*
         if (!gateway.icon) {
           gateway.icon = `${hostingUri}/credit-card.png`
@@ -182,6 +183,7 @@ exports.post = async ({ appSdk }, req, res) => {
           script_uri: `${baseScriptUri}/post/scripts/silentorderpost-1.0.min.js`,
           onload_expression: `window._braspagAccessToken="${accessTokenSOP}";` +
             `window._braspagIsSandbox=${scriptIsSandBox};` +
+            `window._braspagFingerprintApp="${fingerprintApp}";` +
             fs.readFileSync(path.join(__dirname, '../../../assets/dist/onload-expression.min.js'), 'utf8'),
           cc_hash: {
             function: '_braspagHashCard',
