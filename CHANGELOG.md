@@ -2,6 +2,53 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.1](https://github.com/ecomplus/application-starter/compare/v1.1.0...v1.1.1) (2024-06-26)
+
+
+### Bug Fixes
+
+* **antifraud:** add params to antifraud ([d0292eb](https://github.com/ecomplus/application-starter/commit/d0292eb6de7bcb52d8b77b6afeb08c687daedb84))
+* **create-transaction:** add address in customer to bilet ([64a1ee3](https://github.com/ecomplus/application-starter/commit/64a1ee38ee9fe42589d60955b0883967575877d7))
+* **create-transaction:** add fields to customer to credit card ([fe02213](https://github.com/ecomplus/application-starter/commit/fe0221324765e73c45ab19f94625e0b6eb83c649))
+* **create-transaction:** add more fields to fraud analysis ([bc9af70](https://github.com/ecomplus/application-starter/commit/bc9af70d2aa17d306cb342ee1957a5aa73c046f7))
+* **create-transaction:** remove provider if api cielo ([b243873](https://github.com/ecomplus/application-starter/commit/b243873f95a59d91a5b2745cc7611ea55debef36))
+* **create-transaction:** remove sop if error ([9f99fc7](https://github.com/ecomplus/application-starter/commit/9f99fc700f2e64c00dc10fe32e4ae6e06f2642c5))
+* **create-transaction:** test banking billet ([8941153](https://github.com/ecomplus/application-starter/commit/8941153b17fb069631b75111e5384a4280e65798))
+* **installments:** add installments in response transaction ([0b35b0e](https://github.com/ecomplus/application-starter/commit/0b35b0ee9debb64c0aa3c86fb92f064b473d2af4))
+* **list-payment payload:** validate pix and banking billet provider for api cielo ([756f097](https://github.com/ecomplus/application-starter/commit/756f097d448a4c7ff3f724aa5a44e4e6e78f1822))
+* **list-payments:** add field fingerprint to antifraud ([d9f9865](https://github.com/ecomplus/application-starter/commit/d9f986573b724d7690ba750b793d9a2783fa0257))
+* **list-payments:** add script cielo to gerate token card ([3d4db1a](https://github.com/ecomplus/application-starter/commit/3d4db1a531508f3cadfcb48652ce8782fa0d729b))
+* **onload-expression:** add debug ([39c7653](https://github.com/ecomplus/application-starter/commit/39c7653da0400ae6f586b4ea5962332a29c6ec0d))
+* **onload-expression:** test script add delay ([98255a5](https://github.com/ecomplus/application-starter/commit/98255a52e7fd5df9b1602b9c9543254027fab978))
+* **onload-expression:** test script add delay ([d04db15](https://github.com/ecomplus/application-starter/commit/d04db1585b1375453d4e64cc573be3ca74e5f756))
+* **onload-expression:** test script fingerprint ([db1192a](https://github.com/ecomplus/application-starter/commit/db1192ad0fe928dfd0d3d7a361fa72e5495c841b))
+* **onload-expression:** test script fingerprint ([b008953](https://github.com/ecomplus/application-starter/commit/b0089534bd056e790473100299c5880d8be8bc30))
+* **onload-expression:** test scripts ([7283cc3](https://github.com/ecomplus/application-starter/commit/7283cc3646d75a34623179b9d7b3c7d1449d98b6))
+* **onload-expression:** test scripts ([ffd6734](https://github.com/ecomplus/application-starter/commit/ffd67346715a4a894f8a53e5c82200419e9104db))
+* **onload-expression:** test scripts ([c9e7693](https://github.com/ecomplus/application-starter/commit/c9e76932ef4e643cfcd52ff4fc319644f26a5986))
+* **onload-expression:** test scripts ([6aabd17](https://github.com/ecomplus/application-starter/commit/6aabd17a47db1d8c92d811e78a114f0dae56d56f))
+* **onload-expression:** test scripts clearSales ([3f2a5df](https://github.com/ecomplus/application-starter/commit/3f2a5df1703f006f4fa8f8e2258db698ee2b1f12))
+* **onload-expression:** test scripts clearSales ([e20db84](https://github.com/ecomplus/application-starter/commit/e20db84c6206f3ba00eb999b963379be2ad4e9bf))
+* **onload-expression:** test scripts get value ([aa9e96b](https://github.com/ecomplus/application-starter/commit/aa9e96b60c0687b4a66c45855d52743aa7e13ed3))
+* **onload-expression:** test scripts get value ([98cd73f](https://github.com/ecomplus/application-starter/commit/98cd73fb04b07cdd080f48f0e0a8d5af78106102))
+* **onload-expression:** test scripts get value ([e3e1d8b](https://github.com/ecomplus/application-starter/commit/e3e1d8bb3f8189fe5cefcf7586c5503c1239b3fa))
+* **onload-expression:** test scripts in body ([4590048](https://github.com/ecomplus/application-starter/commit/45900487641a38ba7d3ff9e76d1d553ee7f2fb61))
+* **onload-expression:** test scripts in body ([4d5fe15](https://github.com/ecomplus/application-starter/commit/4d5fe15f7b0d53b86ea228adac9880e69c9b1f13))
+* **onload-expression:** test scripts in head ([1361420](https://github.com/ecomplus/application-starter/commit/13614208deb63520524e2a341550f496d6cdfae2))
+* **onload-expression:** test scripts in head ([8592ab9](https://github.com/ecomplus/application-starter/commit/8592ab915d0be833b10d93b7713cea6bcca2ac1b))
+* **onload-expression:** test scripts in head ([e6656d2](https://github.com/ecomplus/application-starter/commit/e6656d288d52944261f5e65ee4a338b4f5c6b250))
+* **onload-expression:** test scripts in head ([6244232](https://github.com/ecomplus/application-starter/commit/624423284f5e5758370515ee4dc6d8b82b912a1a))
+* **package:** update files ([57e4a3e](https://github.com/ecomplus/application-starter/commit/57e4a3ed491aad4072903a19dee73f8d5ec17ebc))
+* **payload-to-transaction:** add auto capture field ([2b46b86](https://github.com/ecomplus/application-starter/commit/2b46b869d22e06ec576ccf4f0a4f878a9b3ceb68))
+* **payload-to-transaction:** use a provider for other payment methods using the Cielo API ([8710db0](https://github.com/ecomplus/application-starter/commit/8710db09174a0447176806f8328758b9e49a18c6))
+* **payload-transaction:** add parse phone customer ([884070b](https://github.com/ecomplus/application-starter/commit/884070bf7726f50eb9b4a6deef40db2e082f9990))
+* **payload-transaction:** add parse phone customer ([c4f61a4](https://github.com/ecomplus/application-starter/commit/c4f61a493ee5adc73160bbcd5d23699aa52e0206))
+* **payload-transaction:** add phone customer ([782d3f3](https://github.com/ecomplus/application-starter/commit/782d3f35cbaa0967fe54b81edcec3c80b89f1542))
+* **sop:** check credentials expires ([adc20db](https://github.com/ecomplus/application-starter/commit/adc20dbcacb80eeecfcaed86a4e4546e0a88286f))
+* **sop:** reduce time expireIn ([5b2a810](https://github.com/ecomplus/application-starter/commit/5b2a8108c4d8a16e225d2077b3f6b74d9545a308))
+* **sop:** remove doc afeter transaction card error ([0615b04](https://github.com/ecomplus/application-starter/commit/0615b048779b128e78f736ba71635ca248fd5cf7))
+* **sop:** remove doc afeter transaction create ([b843c6a](https://github.com/ecomplus/application-starter/commit/b843c6add3a51ed942d281019d98cc5ef029b507))
+
 ## [1.1.0](https://github.com/ecomplus/application-starter/compare/v1.0.0...v1.1.0) (2023-11-03)
 
 
