@@ -44,7 +44,7 @@
       g = b.getElementsByTagName(c)[0]; f.async = 1; f.src = d; g.parentNode.insertBefore(f, g)
       })(window, document, 'script', '//device.clearsale.com.br/p/fp.js', 'csdp');
       csdp('app', 'seu_app');
-      csdp('sessionid', ${fingerPrintId});`
+      csdp('sessionid', '${fingerPrintId}');`
 
     const newScript = document.createElement('script')
     newScript.innerHTML = elementScript
