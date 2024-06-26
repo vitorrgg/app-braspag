@@ -31,8 +31,10 @@
   newForm.innerHTML = elementsScript
   document.body.appendChild(newForm)
 
-  const fingerPrintId = document.getElementById('mySessionId').value
-  console.log('>> id ', fingerPrintId)
+  setTimeout(() => {
+    const fingerPrintId = document.getElementById('mySessionId').value
+    console.log('>> id ', fingerPrintId)
+  }, 100)
 
   window._braspagHashCard = async function (cardClient) {
     document.body.appendChild(newScript)
@@ -48,7 +50,6 @@
     newForm.setAttribute('id', 'formBraspag')
     newForm.innerHTML = elementsForm
     document.body.appendChild(newForm)
-
 
     return new Promise(async function (resolve, reject) {
       const options = {
