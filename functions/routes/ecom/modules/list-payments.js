@@ -158,7 +158,7 @@ exports.post = async ({ appSdk }, req, res) => {
       }
 
       if (isCreditCard) {
-        const fingerprintApp = appData.credit_card?.fingerprint_app
+        const fingerprintApp = appData.fingerprint_app
         /*
         if (!gateway.icon) {
           gateway.icon = `${hostingUri}/credit-card.png`

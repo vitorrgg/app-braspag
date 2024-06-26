@@ -174,6 +174,17 @@ const app = {
       },
       hide: false
     },
+    fingerprint_app: {
+      schema: {
+        type: 'string',
+        maxLength: 255,
+        format: 'uri',
+        title: 'Fingerprint',
+        default: 'seu_app',
+        description: 'Fingerprint (seu_app): Utilizado para antifraude com ClearSales. (Fornecido pela Braspag/Cielo)'
+      },
+      hide: true
+    },
     is_cielo: {
       schema: {
         type: 'boolean',
@@ -269,19 +280,11 @@ const app = {
             title: 'Ícone',
             description: 'Ícone customizado para a forma de pagamento, URL da imagem'
           },
-          fingerprint_app: {
-            type: 'string',
-            maxLength: 255,
-            format: 'uri',
-            title: 'Fingerprint',
-            default: 'seu_app',
-            description: 'Fingerprint (seu_app): Utilizado para antifraude com ClearSales. (Fornecido pela Braspag/Cielo)'
-          }
         },
         title: 'Cartão de crédito',
         description: 'Configurações adicionais para cartão de crédito'
       },
-      hide: true
+      hide: false
     },
     installments: {
       schema: {
