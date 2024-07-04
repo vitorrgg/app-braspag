@@ -45,8 +45,8 @@ exports.post = async ({ appSdk, admin }, req, res) => {
     appData[methodPayment]?.provider === 'Simulado'
 
   if (storeId === '51491' || storeId === 51491) {
-    // add test banking billet to store 51491
-    isSimulated = methodPayment !== 'banking_billet' ? isSimulated : true
+    // add test banking billet and account deposit to store 51491
+    isSimulated = (methodPayment === 'credit_card') ? isSimulated : true
   }
   try {
     const appName = isCielo ? 'Cielo' : 'Braspag'
