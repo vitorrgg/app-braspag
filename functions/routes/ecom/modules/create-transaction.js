@@ -41,13 +41,9 @@ exports.post = async ({ appSdk, admin }, req, res) => {
 
   const { merchant_id: merchantId, merchant_key: merchantKey, is_cielo: isCielo } = appData
   const methodPayment = params.payment_method.code
-  let isSimulated = (methodPayment === 'credit_card' || methodPayment === 'banking_billet') &&
+  const isSimulated = (methodPayment === 'credit_card' || methodPayment === 'banking_billet') &&
     appData[methodPayment]?.provider === 'Simulado'
 
-  if (storeId === '51491' || storeId === 51491) {
-    // add test banking billet and account deposit to store 51491
-    isSimulated = (methodPayment === 'credit_card') ? isSimulated : true
-  }
   try {
     const appName = isCielo ? 'Cielo' : 'Braspag'
     const appAxios = axios(merchantId, merchantKey, null, isSimulated, isCielo)
