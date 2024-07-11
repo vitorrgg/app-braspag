@@ -111,6 +111,8 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       const qrCodeBase64 = payment.QrCodeBase64Image
       const qrCode = payment.QrCodeString
 
+      console.log('payment data', JSON.stringify(payment))
+
       const collectionQrCode = admin.firestore().collection('qr_code_braspag')
       await collectionQrCode.doc(orderId).set({ qrCode: qrCodeBase64 })
 
