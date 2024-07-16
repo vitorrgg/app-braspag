@@ -68,6 +68,8 @@ module.exports = (appData, orderId, params, methodPayment, isCielo) => {
     }
   }
 
+  console.log('>> birth_date', JSON.stringify(buyer?.birth_date))
+
   if (methodPayment === 'credit_card') {
     const hashCard = JSON.parse(Buffer.from(params.credit_card.hash, 'base64'))
     const installmentsNumber = params.installments_number || 1
