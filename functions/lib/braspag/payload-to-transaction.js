@@ -69,6 +69,11 @@ module.exports = (appData, orderId, params, methodPayment, isCielo) => {
   }
 
   console.log('>> birth_date', JSON.stringify(buyer?.birth_date))
+  if (buyer.birth_date) {
+    const { day, month, year } = buyer.birth_date
+    const Birthdate = `${year}-` + `${month}`.padStart(2, '0') + '-' + `${day}`.padStart(2, '0')
+    Object.assign(body.Customer, { Birthdate })
+  }
 
   if (methodPayment === 'credit_card') {
     const hashCard = JSON.parse(Buffer.from(params.credit_card.hash, 'base64'))
@@ -86,12 +91,6 @@ module.exports = (appData, orderId, params, methodPayment, isCielo) => {
       let phone = buyer.phone.country_code ? `+${buyer.phonecountry_code}` : '+55'
       phone += parsePhone(buyer.phone.number)
       Object.assign(body.Customer, { Phone: phone })
-    }
-
-    if (buyer.birth_date) {
-      const { day, month, year } = buyer.birth_date
-      const Birthdate = `${year}-``${month}`.padStart(2, '0')`-``${day}`.padStart(2, '0')``
-      Object.assign(body.Customer, { Birthdate })
     }
 
     if (params.browser_ip) {
