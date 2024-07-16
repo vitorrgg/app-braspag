@@ -108,8 +108,8 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       intermediator.transaction_reference = payment.ProofOfSale
       intermediator.transaction_code = payment.AcquirerTransactionId
 
-      const qrCodeBase64 = payment.QrCodeBase64Image
-      const qrCode = payment.QrCodeString
+      const qrCodeBase64 = payment?.QrCodeBase64Image
+      const qrCode = payment?.QrCodeString
 
       console.log('payment data', JSON.stringify(payment))
 
@@ -142,12 +142,12 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       // delete docSop can only be used once
       await docSOP.delete().catch(console.error)
     }
-    console.log(error.response)
     // try to debug request error
     const errCode = 'BRASPAG_TRANSACTION_ERR'
     let { message } = error
     const err = new Error(`${errCode} #${storeId} - ${orderId} => ${message}`)
     if (error.response) {
+      console.log(error.response)
       const { status, data } = error.response
       if (status !== 401 && status !== 403) {
         err.payment = JSON.stringify(transaction)
@@ -160,8 +160,9 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       } else if (data && Array.isArray(data.errors) && data.errors[0] && data.errors[0].message) {
         message = data.errors[0].message
       }
+    } else {
+      console.error(err)
     }
-    console.error(err)
     res.status(409)
     res.send({
       error: errCode,

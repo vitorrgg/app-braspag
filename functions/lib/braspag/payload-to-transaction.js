@@ -86,8 +86,8 @@ module.exports = (appData, orderId, params, methodPayment, isCielo) => {
       Object.assign(body.Customer, { Phone: phone })
     }
 
-    if (params.birth_date) {
-      const { day, month, year } = params.birth_date
+    if (buyer.birth_date) {
+      const { day, month, year } = buyer.birth_date
       const Birthdate = `${year}-``${month}`.padStart(2, '0')`-``${day}`.padStart(2, '0')``
       Object.assign(body.Customer, { Birthdate })
     }
