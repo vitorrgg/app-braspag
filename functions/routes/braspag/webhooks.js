@@ -56,10 +56,12 @@ exports.post = async ({ appSdk, admin }, req, res) => {
             notificationCode += `${dateTime.toISOString()};`
           }
 
-          console.log('>> openedAt', openedAt)
           if (openedAt) {
+            // Braspag invoices do not validate the payment time, only the day is informed.
+            // If the payment is made on the same day, a payment history will be generated before the order is created,
+            // and will not update the order status.
+
             const dateOpenedAt = new Date(openedAt)
-            console.log('>> compare', dateTime.toISOString(), dateOpenedAt.toISOString())
             if (dateTime.getTime() <= dateOpenedAt.getTime()) {
               dateTime = new Date()
             }
