@@ -34,29 +34,37 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       const appName = isCielo ? 'Cielo' : 'Braspag'
       const appAxios = axios(merchantId, merchantKey, true, false, isCielo)
       const { data: { Payment: payment } } = await appAxios.get(`/sales/${body.PaymentId}`)
-      let dateTime = new Date().toISOString()
+      let dateTime = new Date()
       console.log(`>> payment [${appName}]: ${JSON.stringify(payment)}`)
 
       const order = await getOrderIntermediatorTransactionId(appSdk, storeId, body.PaymentId, auth)
       if (order) {
+        const openedAt = order.opened_at
         const status = (parseStatus[payment.Status] || 'unknown')
         if (order.financial_status.current !== status) {
           // updadte status
           const transaction = order.transactions.find(transaction => transaction.intermediator.transaction_id === body.PaymentId)
           console.log('>> Try add payment history')
 
-          let notificationCode = `${type};${payment.type};`
+          let notificationCode = `${type};${payment.Type};`
           if ((parseStatus[payment.Status] === 'refunded' || parseStatus[payment.Status] === 'voided') &&
             payment?.VoidedDate) {
-            dateTime = new Date(`${payment?.VoidedDate} UTC-3`).toISOString()
+            dateTime = new Date(`${payment?.VoidedDate} UTC-3`)
             notificationCode += `${dateTime};`
           } else if (payment.CapturedDate && parseStatus[payment.Status] === 'paid') {
-            dateTime = new Date(`${payment?.CapturedDate} UTC-3`).toISOString()
+            dateTime = new Date(`${payment.CapturedDate} UTC-3`)
             notificationCode += `${dateTime};`
           }
 
+          if (openedAt && dateTime) {
+            const dateOpenedAt = new Date(openedAt)
+            if (dateTime.getTime() <= dateOpenedAt.getTime()) {
+              dateTime = new Date()
+            }
+          }
+
           const bodyPaymentHistory = {
-            date_time: dateTime,
+            date_time: dateTime.toISOString(),
             status,
             notification_code: notificationCode,
             flags: [appName]
