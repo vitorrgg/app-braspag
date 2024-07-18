@@ -16,7 +16,7 @@ const updateTransaction = (appSdk, storeId, orderId, auth, body, transactionId) 
 
 const getOrderIntermediatorTransactionId = async (appSdk, storeId, invoiceId, auth) => {
   let queryString = `?transactions.intermediator.transaction_id=${invoiceId}`
-  queryString += '&fields=transactions,financial_status.current,status'
+  queryString += '&fields=transactions,financial_status.current,status,opened_at'
   const { response: { data } } = await appSdk
     .apiRequest(storeId, `/orders.json${queryString}`, 'GET', null, auth)
 

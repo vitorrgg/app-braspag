@@ -53,11 +53,13 @@ exports.post = async ({ appSdk, admin }, req, res) => {
             notificationCode += `${dateTime};`
           } else if (payment.CapturedDate && parseStatus[payment.Status] === 'paid') {
             dateTime = new Date(`${payment.CapturedDate} UTC-3`)
-            notificationCode += `${dateTime};`
+            notificationCode += `${dateTime.toISOString()};`
           }
 
-          if (openedAt && dateTime) {
+          console.log('>> openedAt', openedAt)
+          if (openedAt) {
             const dateOpenedAt = new Date(openedAt)
+            console.log('>> compare', dateTime.toISOString(), dateOpenedAt.toISOString())
             if (dateTime.getTime() <= dateOpenedAt.getTime()) {
               dateTime = new Date()
             }
