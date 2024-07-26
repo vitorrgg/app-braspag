@@ -120,7 +120,7 @@ exports.post = async ({ appSdk }, req, res) => {
         if (discount.apply_at !== 'freight') {
           // default discount option
           response.discount_option = {
-            label: config.discount_option_label || gateway.label,
+            label: appData.discount_option_label || gateway.label,
             min_amount: discount.min_amount,
             apply_at: discount.apply_at,
             type: discount.type,
