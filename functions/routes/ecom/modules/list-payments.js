@@ -80,6 +80,7 @@ exports.post = async ({ appSdk }, req, res) => {
     code: 'braspag'
   }
 
+  const { discount } = appData
   listPaymentMethod.forEach(async paymentMethod => {
     const isPix = paymentMethod === 'account_deposit'
     const isCreditCard = paymentMethod === 'credit_card'
@@ -115,24 +116,27 @@ exports.post = async ({ appSdk }, req, res) => {
         intermediator
       }
 
-      const discount = appData.discount
-
       if (discount[paymentMethod]) {
-        gateway.discount = {
-          apply_at: discount.apply_at,
-          type: discount.type,
-          value: discount.value
+        if (discount.apply_at !== 'freight') {
+          // default discount option
+          response.discount_option = {
+            label: config.discount_option_label || gateway.label,
+            min_amount: discount.min_amount,
+            apply_at: discount.apply_at,
+            type: discount.type,
+            value: discount.value
+          }
         }
 
         // check amount value to apply discount
-        if (amount.total < (discount.min_amount || 0)) {
-          delete gateway.discount
-        } else {
-          delete discount.min_amount
-
+        if (!(amount.total < discount.min_amount)) {
+          gateway.discount = {
+            apply_at: discount.apply_at,
+            type: discount.type,
+            value: discount.value
+          }
           // fix local amount object
           const applyDiscount = discount.apply_at
-
           const maxDiscount = amount[applyDiscount || 'subtotal']
           let discountValue
           if (discount.type === 'percentage') {
@@ -143,7 +147,6 @@ exports.post = async ({ appSdk }, req, res) => {
               discountValue = maxDiscount
             }
           }
-
           if (discountValue) {
             amount.discount = (amount.discount || 0) + discountValue
             amount.total -= discountValue
@@ -151,9 +154,6 @@ exports.post = async ({ appSdk }, req, res) => {
               amount.total = 0
             }
           }
-        }
-        if (response.discount_option) {
-          response.discount_option.min_amount = discount.min_amount
         }
       }
 
