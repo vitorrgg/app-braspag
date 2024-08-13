@@ -110,23 +110,27 @@ exports.post = async ({ appSdk, admin }, req, res) => {
 
       const qrCodeBase64 = payment?.QrCodeBase64Image
       const qrCode = payment?.QrCodeString
+      const status = parseStatus[payment.Status]
 
-      console.log('payment data', JSON.stringify(payment))
+      console.log(`payment data, ${JSON.stringify(payment)} status: ${status}`)
 
-      const collectionQrCode = admin.firestore().collection('qr_code_braspag')
-      await collectionQrCode.doc(orderId).set({ qrCode: qrCodeBase64 })
+      if (qrCodeBase64) {
+        const collectionQrCode = admin.firestore().collection('qr_code_braspag')
+        await collectionQrCode.doc(orderId).set({ qrCode: qrCodeBase64 })
+          .catch(console.error)
 
-      const qrCodeSrc = `${baseUri}/qr-code?orderId=${orderId}`
+        const qrCodeSrc = `${baseUri}/qr-code?orderId=${orderId}`
 
-      transaction.notes = '<div style="display:block;margin:0 auto"> ' +
-        `<img src="${qrCodeSrc}" style="display:block;margin:0 auto; width:150px;"> ` +
-        `<input readonly type="text" id="pix-copy" value="${qrCode}" />` +
-        `<button type="button" class="btn btn-sm btn-light" onclick="let codePix = document.getElementById('pix-copy')
-          codePix.select()
-          document.execCommand('copy')">Copiar Pix</button></div>`
+        transaction.notes = '<div style="display:block;margin:0 auto"> ' +
+          `<img src="${qrCodeSrc}" style="display:block;margin:0 auto; width:150px;"> ` +
+          `<input readonly type="text" id="pix-copy" value="${qrCode}" />` +
+          `<button type="button" class="btn btn-sm btn-light" onclick="let codePix = document.getElementById('pix-copy')
+            codePix.select()
+            document.execCommand('copy')">Copiar Pix</button></div>`
+      }
 
       transaction.status = {
-        current: 'pending',
+        current: status || 'unknown',
         updated_at: new Date().toISOString()
       }
     }
