@@ -23,9 +23,8 @@ exports.post = async ({ appSdk, admin }, req, res) => {
   const appData = Object.assign({}, application.data, application.hidden_data)
   // setup required `transaction` response object
   const { amount } = params
-  const transaction = {
-    amount: amount.total
-  }
+  const transaction = { amount: amount.total }
+  const timeout = 40000
 
   let docSOP
   const firestoreColl = 'braspag_token_sop'
@@ -49,11 +48,19 @@ exports.post = async ({ appSdk, admin }, req, res) => {
     const appAxios = axios(merchantId, merchantKey, null, isSimulated, isCielo)
     const body = bodyBraspag(appData, orderId, params, methodPayment, isCielo)
     console.log(`>> body #${storeId} [${appName}]: ${JSON.stringify(body)}`)
-    const { data } = await appAxios.post('/sales', body)
+    const { data } = await appAxios.post('/sales', body, { timeout })
     console.log(`>> data #${storeId} [${appName}]: ${JSON.stringify(data)}`)
 
     const payment = data.Payment
     const intermediator = {}
+
+    if (!payment || payment.Status === 0) {
+      const errorBraspag = new Error('Braspag API Error')
+      const method = methodPayment === 'account_deposit' ? 'PIX' : methodPayment.replace('_', ' ')
+      errorBraspag.message = `Braspag API is unable to generate payment with ${method}`
+      throw errorBraspag
+    }
+    const status = parseStatus[payment.Status]
 
     if (methodPayment === 'credit_card') {
       // delete docSop can only be used once
@@ -85,7 +92,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       }
 
       transaction.status = {
-        current: parseStatus[payment.Status] || 'unknown',
+        current: status || 'unknown',
         updated_at: payment.CapturedDate ? new Date(`${payment.CapturedDate} UTC+0`).toISOString() : new Date().toISOString()
       }
     } else if (methodPayment === 'banking_billet') {
@@ -110,13 +117,10 @@ exports.post = async ({ appSdk, admin }, req, res) => {
 
       const qrCodeBase64 = payment?.QrCodeBase64Image
       const qrCode = payment?.QrCodeString
-      const status = parseStatus[payment.Status]
-
-      console.log(`payment data, ${JSON.stringify(payment)} status: ${status}`)
 
       if (qrCodeBase64) {
         const collectionQrCode = admin.firestore().collection('qr_code_braspag')
-        await collectionQrCode.doc(orderId).set({ qrCode: qrCodeBase64 })
+        await collectionQrCode.doc(orderId).set({ qrCode: qrCodeBase64, storeId })
           .catch(console.error)
 
         const qrCodeSrc = `${baseUri}/qr-code?orderId=${orderId}`
@@ -137,7 +141,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
 
     transaction.intermediator = intermediator
 
-    res.send({
+    return res.send({
       redirect_to_payment: redirectToPayment,
       transaction
     })
@@ -150,7 +154,9 @@ exports.post = async ({ appSdk, admin }, req, res) => {
     const errCode = 'BRASPAG_TRANSACTION_ERR'
     let { message } = error
     const err = new Error(`${errCode} #${storeId} - ${orderId} => ${message}`)
-    if (error.response) {
+    if (error.code && error.code === 'ECONNABORTED' && message.includes('timeout')) {
+      message = 'Braspag API timed out trying to create the transaction'
+    } else if (error.response) {
       console.log(error.response)
       const { status, data } = error.response
       if (status !== 401 && status !== 403) {
@@ -167,10 +173,11 @@ exports.post = async ({ appSdk, admin }, req, res) => {
     } else {
       console.error(err)
     }
-    res.status(409)
-    res.send({
-      error: errCode,
-      message
-    })
+
+    return res.status(409)
+      .send({
+        error: errCode,
+        message
+      })
   }
 }
