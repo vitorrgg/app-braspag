@@ -141,7 +141,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
 
     transaction.intermediator = intermediator
 
-    return res.send({
+    res.send({
       redirect_to_payment: redirectToPayment,
       transaction
     })
@@ -174,10 +174,10 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       console.error(err)
     }
 
-    return res.status(409)
-      .send({
-        error: errCode,
-        message
-      })
+    res.status(409)
+    res.send({
+      error: errCode,
+      message
+    })
   }
 }
