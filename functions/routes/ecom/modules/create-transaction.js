@@ -24,7 +24,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
   // setup required `transaction` response object
   const { amount } = params
   const transaction = { amount: amount.total }
-  const timeout = 40000
+  const timeout = 28000
 
   let docSOP
   const firestoreColl = 'braspag_token_sop'
@@ -107,7 +107,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       // transaction_code: data.retorno
 
       transaction.status = {
-        current: 'pending',
+        current: status || 'unknown',
         updated_at: new Date().toISOString()
       }
     } else {
