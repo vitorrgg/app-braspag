@@ -102,6 +102,8 @@ exports.post = async ({ appSdk, admin }, req, res) => {
         link: payment.Url
       }
 
+      transaction.payment_link = payment.Url
+
       intermediator.transaction_id = payment.PaymentId
       intermediator.transaction_reference = payment.BoletoNumber
       // transaction_code: data.retorno
