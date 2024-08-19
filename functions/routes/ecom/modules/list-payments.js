@@ -21,8 +21,6 @@ exports.post = async ({ appSdk }, req, res) => {
   const { params, application } = req.body
   const { storeId } = req
 
-  const amount = { ...params.amount } || {}
-
   // merge all app options configured by merchant
   const appData = Object.assign({}, application.data, application.hidden_data)
   const listPaymentMethod = ['banking_billet', 'account_deposit']
@@ -93,6 +91,7 @@ exports.post = async ({ appSdk }, req, res) => {
       console.warn('Provider for banking billet not allowed for Cielo API')
     }
 
+    const amount = { ...params.amount } || {}
     const minAmount = methodConfig?.min_amount || 0
     const validateAmount = amount.total ? (amount.total >= minAmount) : true // Workaround for showcase
     if (methodEnable && validateAmount) {
