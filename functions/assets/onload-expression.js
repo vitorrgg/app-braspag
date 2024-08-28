@@ -1,9 +1,7 @@
-; (function () {
+;(function () {
   const isSandbox = window._braspagIsSandbox
   const accessToken = window._braspagAccessToken
   const fingerprintApp = window._braspagFingerprintApp
-
-  console.log(`>> SOP: ${isSandbox? 'SandBox' : ''}`, ' fingerprint', fingerprintApp)
 
   const elementScript = `(function (a, b, c, d, e, f, g) {
     a['CsdpObject'] = e; a[e] = a[e] || function () {
@@ -11,7 +9,7 @@
     }, a[e].l = 1 * new Date(); f = b.createElement(c),
     g = b.getElementsByTagName(c)[0]; f.async = 1; f.src = d; g.parentNode.insertBefore(f, g)
     })(window, document, 'script', '//device.clearsale.com.br/p/fp.js', 'csdp');
-    csdp('app', '${fingerprintApp || 'seu_app'}');
+    csdp('app', '${fingerprintApp}');
     csdp('outputsessionid', 'mySessionId');`
 
   const newScript = document.createElement('script')
@@ -57,10 +55,10 @@
     newForm.innerHTML = elementsForm
     document.body.appendChild(newForm)
 
-    return new Promise(async function (resolve, reject) {
+    return new Promise((resolve, reject) => {
       const options = {
         accessToken,
-        onSuccess: function (response) {
+        onSuccess (response) {
           // console.log('>', response)
           if (response.PaymentToken) {
             const data = JSON.stringify({ token: response.PaymentToken, fingerPrintId })
@@ -70,10 +68,10 @@
             reject(error)
           }
         },
-        onError: function (response) {
+        onError (response) {
           reject(response)
         },
-        onInvalid: function (validationResults) {
+        onInvalid (validationResults) {
           reject(validationResults)
         },
         environment: isSandbox ? 'sandbox' : 'production',
