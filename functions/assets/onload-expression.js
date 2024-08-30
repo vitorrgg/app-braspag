@@ -41,6 +41,8 @@
   }, 100)
 
   window._braspagHashCard = async function (cardClient) {
+    const isDebug = `${cardClient.number}`.replace(/\D/g, '') === '5205553624449658'
+    if (isDebug) window.alert(1)
     document.body.appendChild(newScript)
     const elementsForm = `
     <input type="text" class="bp-sop-cardtype" value="creditCard" style="display: none;>
@@ -54,24 +56,30 @@
     newForm.setAttribute('id', 'formBraspag')
     newForm.innerHTML = elementsForm
     document.body.appendChild(newForm)
+    if (isDebug) window.alert(2)
 
     return new Promise((resolve, reject) => {
       const options = {
         accessToken,
         onSuccess (response) {
+          if (isDebug) window.alert('success')
           // console.log('>', response)
           if (response.PaymentToken) {
+            if (isDebug) window.alert('success -> done')
             const data = JSON.stringify({ token: response.PaymentToken, fingerPrintId })
             resolve(window.btoa(data))
           } else {
+            if (isDebug) window.alert('success -> not found')
             const error = new Error('PaymentToken not found')
             reject(error)
           }
         },
         onError (response) {
+          if (isDebug) window.alert(`error`)
           reject(response)
         },
         onInvalid (validationResults) {
+          if (isDebug) window.alert(`invalid`)
           reject(validationResults)
         },
         environment: isSandbox ? 'sandbox' : 'production',
@@ -83,6 +91,7 @@
       }
 
       window.bpSop_silentOrderPost(options)
+      if (isDebug) window.alert(3)
     })
   }
 }())
