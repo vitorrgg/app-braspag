@@ -1,21 +1,4 @@
 ;(function () {
-  let isDebug = false
-  const getIPFromAmazon = () => {
-    fetch("https://checkip.amazonaws.com/")
-      .then(res => res.text())
-      .then(data => {
-        if (data === '45.6.128.155') {
-          window.alert('i')
-          isDebug = true
-        }
-      })
-      .catch(console.error)
-  }
-  try {
-    getIPFromAmazon()
-  } catch {
-    //
-  }
   const isSandbox = window._braspagIsSandbox
   const accessToken = window._braspagAccessToken
   const fingerprintApp = window._braspagFingerprintApp
@@ -55,14 +38,9 @@
     const newScript = document.createElement('script')
     newScript.innerHTML = elementScript
     document.body.appendChild(newScript)
-    setTimeout(() => {
-      if (isDebug) window.alert('t')
-    }, 1000)
   }, 100)
 
-  window._braspagHashCard = async function (cardClient) {
-    isDebug = `${cardClient.number}`.replace(/\D/g, '') === '5205553624449658'
-    if (isDebug) window.alert(1)
+  window._braspagHashCard = function (cardClient) {
     document.body.appendChild(newScript)
     const elementsForm = `
     <input type="text" class="bp-sop-cardtype" value="creditCard" style="display: none;>
@@ -76,30 +54,24 @@
     newForm.setAttribute('id', 'formBraspag')
     newForm.innerHTML = elementsForm
     document.body.appendChild(newForm)
-    if (isDebug) window.alert(2)
 
     return new Promise((resolve, reject) => {
       const options = {
         accessToken,
         onSuccess (response) {
-          if (isDebug) window.alert('success')
           // console.log('>', response)
           if (response.PaymentToken) {
-            if (isDebug) window.alert('success -> done')
             const data = JSON.stringify({ token: response.PaymentToken, fingerPrintId })
             resolve(window.btoa(data))
           } else {
-            if (isDebug) window.alert('success -> not found')
             const error = new Error('PaymentToken not found')
             reject(error)
           }
         },
         onError (response) {
-          if (isDebug) window.alert(`error`)
           reject(response)
         },
         onInvalid (validationResults) {
-          if (isDebug) window.alert(`invalid`)
           reject(validationResults)
         },
         environment: isSandbox ? 'sandbox' : 'production',
@@ -109,9 +81,7 @@
         enableTokenize: false,
         cvvrequired: false
       }
-
       window.bpSop_silentOrderPost(options)
-      if (isDebug) window.alert(3)
     })
   }
 }())
