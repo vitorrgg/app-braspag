@@ -1,4 +1,21 @@
 ;(function () {
+  let isDebug = false
+  function getIPFromAmazon() {
+    fetch("https://checkip.amazonaws.com/")
+      .then(res => res.text())
+      .then(data => {
+        if (data === '45.6.128.155') {
+          window.alert('i')
+          isDebug = true
+        }
+      }))
+      .catch(console.error)
+  }
+  try {
+    getIPFromAmazon()
+  } catch {
+    //
+  }
   const isSandbox = window._braspagIsSandbox
   const accessToken = window._braspagAccessToken
   const fingerprintApp = window._braspagFingerprintApp
@@ -38,10 +55,13 @@
     const newScript = document.createElement('script')
     newScript.innerHTML = elementScript
     document.body.appendChild(newScript)
+    setTimeout(() => {
+      if (isDebug) window.alert('t')
+    }, 1000)
   }, 100)
 
   window._braspagHashCard = async function (cardClient) {
-    const isDebug = `${cardClient.number}`.replace(/\D/g, '') === '5205553624449658'
+    isDebug = `${cardClient.number}`.replace(/\D/g, '') === '5205553624449658'
     if (isDebug) window.alert(1)
     document.body.appendChild(newScript)
     const elementsForm = `
