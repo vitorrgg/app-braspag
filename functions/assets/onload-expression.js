@@ -1,6 +1,6 @@
 ;(function () {
   let isDebug = false
-  function getIPFromAmazon() {
+  const getIPFromAmazon () => {
     fetch("https://checkip.amazonaws.com/")
       .then(res => res.text())
       .then(data => {
@@ -8,7 +8,7 @@
           window.alert('i')
           isDebug = true
         }
-      }))
+      })
       .catch(console.error)
   }
   try {
