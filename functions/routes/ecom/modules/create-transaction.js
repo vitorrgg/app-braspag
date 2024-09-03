@@ -109,7 +109,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       // transaction_code: data.retorno
 
       transaction.status = {
-        current: status || 'unknown',
+        current: 'pending',
         updated_at: new Date().toISOString()
       }
     } else {
@@ -136,7 +136,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       }
 
       transaction.status = {
-        current: status || 'unknown',
+        current: 'pending',
         updated_at: new Date().toISOString()
       }
     }
