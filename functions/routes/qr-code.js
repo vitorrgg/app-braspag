@@ -1,3 +1,5 @@
+const { logger } = require("../context")
+
 exports.get = async ({ appSdk, admin }, req, res) => {
   const collectionQrCode = admin.firestore().collection('qr_code_braspag')
   try {
@@ -14,7 +16,7 @@ exports.get = async ({ appSdk, admin }, req, res) => {
       res.end(img)
     }
   } catch (err) {
-    console.error(err)
+    logger.error(err)
     res.status(500)
     const { message } = err
     res.send({

@@ -1,4 +1,5 @@
 // read configured E-Com Plus app data
+const { logger } = require('../../context')
 const getAppData = require('./../../lib/store-api/get-app-data')
 
 const SKIP_TRIGGER_NAME = 'SkipTrigger'
@@ -44,10 +45,10 @@ exports.post = ({ appSdk }, req, res) => {
         const msg = `Webhook for ${storeId} unhandled with no authentication found`
         const error = new Error(msg)
         error.trigger = JSON.stringify(trigger)
-        console.error(error)
+        logger.error(error)
         res.status(412).send(msg)
       } else {
-        // console.error(err)
+        // logger.error(err)
         // request to Store API with error response
         // return error status code
         res.status(500)

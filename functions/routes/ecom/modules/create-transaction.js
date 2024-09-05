@@ -1,4 +1,5 @@
 const { baseUri } = require('../../../__env')
+const { logger } = require('../../../context')
 const axios = require('../../../lib/braspag/create-axios')
 const { parseStatus } = require('../../../lib/braspag/parse-utils')
 const bodyBraspag = require('../../../lib/braspag/payload-to-transaction')
@@ -47,9 +48,9 @@ exports.post = async ({ appSdk, admin }, req, res) => {
     const appName = isCielo ? 'Cielo' : 'Braspag'
     const appAxios = axios(merchantId, merchantKey, null, isSimulated, isCielo)
     const body = bodyBraspag(appData, orderId, params, methodPayment, isCielo)
-    console.log(`>> body #${storeId} [${appName}]: ${JSON.stringify(body)}`)
+    logger.info(`>> body #${storeId} [${appName}]: ${JSON.stringify(body)}`)
     const { data } = await appAxios.post('/sales', body, { timeout })
-    console.log(`>> data #${storeId} [${appName}]: ${JSON.stringify(data)}`)
+    logger.info(`>> data #${storeId} [${appName}]: ${JSON.stringify(data)}`)
 
     const payment = data.Payment
     const intermediator = {}
@@ -66,7 +67,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       // delete docSop can only be used once
       if (docSOP) {
         await docSOP.delete()
-          .catch(console.error)
+          .catch(logger.error)
       }
       intermediator.transaction_id = payment.PaymentId
       intermediator.transaction_reference = payment.ProofOfSale
@@ -123,7 +124,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       if (qrCodeBase64) {
         const collectionQrCode = admin.firestore().collection('qr_code_braspag')
         await collectionQrCode.doc(orderId).set({ qrCode: qrCodeBase64, storeId })
-          .catch(console.error)
+          .catch(logger.error)
 
         const qrCodeSrc = `${baseUri}/qr-code?orderId=${orderId}`
 
@@ -150,7 +151,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
   } catch (error) {
     if (docSOP) {
       // delete docSop can only be used once
-      await docSOP.delete().catch(console.error)
+      await docSOP.delete().catch(logger.error)
     }
     // try to debug request error
     const errCode = 'BRASPAG_TRANSACTION_ERR'
@@ -159,7 +160,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
     if (error.code && error.code === 'ECONNABORTED' && message.includes('timeout')) {
       message = 'Braspag API timed out trying to create the transaction'
     } else if (error.response) {
-      console.log(error.response)
+      logger.warn(error.response)
       const { status, data } = error.response
       if (status !== 401 && status !== 403) {
         err.payment = JSON.stringify(transaction)
@@ -173,7 +174,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
         message = data.errors[0].message
       }
     } else {
-      console.error(err)
+      logger.error(err)
     }
 
     res.status(409)

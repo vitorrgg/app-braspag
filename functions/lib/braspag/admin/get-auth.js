@@ -1,3 +1,4 @@
+const { logger } = require('../../../context')
 const auth = require('./create-auth')
 
 module.exports = function (clientId, clientSecret, storeId, isSandbox = false, firestoreColl = 'braspag_admin') {
@@ -19,10 +20,10 @@ module.exports = function (clientId, clientSecret, storeId, isSandbox = false, f
     }
 
     const handleAuth = (isSandbox) => {
-      console.log(`> Admin Braspag Auth #${storeId} ${isSandbox ? 'SandBox' : ''}`)
+      logger.info(`> Admin Braspag Auth #${storeId} ${isSandbox ? 'SandBox' : ''}`)
       auth(hashLogin, isSandbox)
         .then((data) => {
-          console.log(`> Admin Braspag ${JSON.stringify(data)}`)
+          logger.info(`> Admin Braspag ${JSON.stringify(data)}`)
           authenticate(data.access_token)
           const expiresIn = Date.now() + (data.expires_in * 1000)
           if (documentRef) {
@@ -32,7 +33,7 @@ module.exports = function (clientId, clientSecret, storeId, isSandbox = false, f
               expiresInToString: new Date(expiresIn).toISOString(),
               updated_at: new Date().toISOString(),
               isSandbox
-            }).catch(console.error)
+            }).catch(logger.error)
           }
         })
         .catch(reject)
@@ -49,7 +50,7 @@ module.exports = function (clientId, clientSecret, storeId, isSandbox = false, f
             handleAuth(isSandbox)
           }
         })
-        .catch(console.error)
+        .catch(logger.error)
     } else {
       handleAuth(isSandbox)
     }

@@ -1,5 +1,6 @@
 const axios = require('axios')
 const OAuth2AdminBraspag = require('../admin/get-auth')
+const { logger } = require('../../../context')
 
 const auth = async (clientId, clientSecret, merchantId, storeId, isSandbox) => new Promise((resolve, reject) => {
   const oAuth2AdminBraspag = new OAuth2AdminBraspag(
@@ -60,10 +61,10 @@ module.exports = function (clientId, clientSecret, merchantId, storeId, isSandbo
     }
 
     const handleAuth = (isSandbox) => {
-      console.log(`> Braspag SOP #${storeId} ${isSandbox ? 'SandBox' : ''}`)
+      logger.info(`> Braspag SOP #${storeId} ${isSandbox ? 'SandBox' : ''}`)
       auth(clientId, clientSecret, merchantId, storeId, isSandbox)
         .then((data) => {
-          console.log('> Braspag SOP Token Update')
+          logger.info('> Braspag SOP Token Update')
           authenticate(data.accessToken)
           const expiresInToString = new Date(data.expiresIn).toISOString()
           if (documentRef) {
@@ -75,7 +76,7 @@ module.exports = function (clientId, clientSecret, merchantId, storeId, isSandbo
               updated_at: new Date().toISOString(),
               isSandbox
             })
-              .catch(console.error)
+              .catch(logger.error)
           }
         })
         .catch(reject)
@@ -92,7 +93,7 @@ module.exports = function (clientId, clientSecret, merchantId, storeId, isSandbo
             handleAuth(isSandbox)
           }
         })
-        .catch(console.error)
+        .catch(logger.error)
     } else {
       handleAuth(isSandbox)
     }

@@ -6,6 +6,7 @@ const {
   addPaymentHistory,
   getOrderIntermediatorTransactionId
 } = require('../../lib/store-api/utils')
+const { logger } = require('../../context')
 
 exports.post = async ({ appSdk, admin }, req, res) => {
   const { body, query } = req
@@ -21,7 +22,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
     const type = body.ChangeType
     const storeId = parseInt(query.store_id, 10)
 
-    console.log(`>> webhook ${JSON.stringify(body)}, type:${type}, store: ${storeId}`)
+    logger.info(`>> webhook ${JSON.stringify(body)}, type:${type}, store: ${storeId}`)
     const auth = await appSdk.getAuth(storeId)
     const appData = await getAppData({ appSdk, storeId, auth })
     const { merchant_id: merchantId, merchant_key: merchantKey, is_cielo: isCielo } = appData
@@ -35,7 +36,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       const appAxios = axios(merchantId, merchantKey, true, false, isCielo)
       const { data: { Payment: payment } } = await appAxios.get(`/sales/${body.PaymentId}`)
       let dateTime = new Date()
-      console.log(`>> payment [${appName}]: ${JSON.stringify(payment)}`)
+      logger.info(`>> payment [${appName}]: ${JSON.stringify(payment)}`)
 
       const order = await getOrderIntermediatorTransactionId(appSdk, storeId, body.PaymentId, auth)
       if (order) {
@@ -44,7 +45,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
         if (order.financial_status.current !== status) {
           // updadte status
           const transaction = order.transactions.find(transaction => transaction.intermediator.transaction_id === body.PaymentId)
-          console.log('>> Try add payment history')
+          logger.info('>> Try add payment history')
 
           let notificationCode = `${type};${payment.Type};`
           if ((parseStatus[payment.Status] === 'refunded' || parseStatus[payment.Status] === 'voided') &&
@@ -76,12 +77,12 @@ exports.post = async ({ appSdk, admin }, req, res) => {
           if (transaction && transaction._id) {
             bodyPaymentHistory.transaction_id = transaction._id
           }
-          // console.log('>> ', dateTime, ' ', payment?.CapturedDate,  ' ',  payment?.VoidedDate)
+          // logger.info('>> ', dateTime, ' ', payment?.CapturedDate,  ' ',  payment?.VoidedDate)
           await addPaymentHistory(appSdk, storeId, order._id, auth, bodyPaymentHistory)
-          console.log(`>> Status update to ${status}`)
+          logger.info(`>> Status update to ${status}`)
           return res.sendStatus(200)
         } else {
-          console.log(`Status is ${status}`)
+          logger.info(`Status is ${status}`)
           return res.sendStatus(200)
         }
       } else {
@@ -90,7 +91,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       }
     }
   } catch (error) {
-    console.error(error)
+    logger.error(error)
     const errCode = 'WEBHOOK_BRASPAG_INTERNAL_ERR'
     let status = 409
     let message = error.message

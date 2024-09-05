@@ -3,6 +3,7 @@ const path = require('path')
 const { /* hostingUri, */ isSandbox } = require('../../../__env')
 const addInstallments = require('../../../lib/payments/add-payments')
 const TokenSOPBraspag = require('../../../lib/braspag/sop/get-access-token')
+const { logger } = require('../../../context')
 
 exports.post = async ({ appSdk }, req, res) => {
   /**
@@ -63,7 +64,7 @@ exports.post = async ({ appSdk }, req, res) => {
         listPaymentMethod.push('credit_card')
       }
     } catch (error) {
-      console.error(error)
+      logger.error(error)
     }
   }
 
@@ -88,7 +89,7 @@ exports.post = async ({ appSdk }, req, res) => {
     if (paymentMethod === 'banking_billet' && isCielo) {
       // https://developercielo.github.io/manual/cielo-ecommerce#boleto
       methodEnable = providersCieloBanking.includes(methodConfig.provider)
-      console.warn('Provider for banking billet not allowed for Cielo API')
+      logger.warn('Provider for banking billet not allowed for Cielo API')
     }
 
     const amount = { ...params.amount } || {}
