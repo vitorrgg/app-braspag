@@ -1,47 +1,44 @@
 ;(function () {
   const isSandbox = window._braspagIsSandbox
   const accessToken = window._braspagAccessToken
-  const fingerprintApp = window._braspagFingerprintApp
+  const fingerprintApp = window._braspagFingerprintApp || 'seu_app'
 
-  const elementScript = `(function (a, b, c, d, e, f, g) {
-    a['CsdpObject'] = e; a[e] = a[e] || function () {
-    (a[e].q = a[e].q || []).push(arguments)
-    }, a[e].l = 1 * new Date(); f = b.createElement(c),
-    g = b.getElementsByTagName(c)[0]; f.async = 1; f.src = d; g.parentNode.insertBefore(f, g)
-    })(window, document, 'script', '//device.clearsale.com.br/p/fp.js', 'csdp');
-    csdp('app', '${fingerprintApp}');
-    csdp('outputsessionid', 'mySessionId');`
+  const form = document.createElement('form')
+  form.id = 'fingerprintForm'
+  document.body.appendChild(form)
 
-  const newScript = document.createElement('script')
-  newScript.innerHTML = elementScript
-  document.head.appendChild(newScript)
+  const sessionInput = document.createElement('input')
+  sessionInput.id = 'mySessionId'
+  sessionInput.type = 'hidden'
+  form.appendChild(sessionInput)
 
-  const elementsScript = '<input type="hidden" id="mySessionId" value=""/>'
-  const newForm = document.createElement('form')
-  newForm.innerHTML = elementsScript
-  document.body.appendChild(newForm)
-
-  let fingerPrintId
-  setTimeout(() => {
-    fingerPrintId = document.getElementById('mySessionId').value
-
-    const elementScript = `
-    (function (a, b, c, d, e, f, g) {
-      a['CsdpObject'] = e; a[e] = a[e] || function () {
-      (a[e].q = a[e].q || []).push(arguments)
-      }, a[e].l = 1 * Date.now(); f = b.createElement(c),
-      g = b.getElementsByTagName(c)[0]; f.async = 1; f.src = d; g.parentNode.insertBefore(f, g)
+  function injectClearSaleScript (app, sessionId) {
+    const scriptContent = `
+      (function (a, b, c, d, e, f, g) {
+        a['CsdpObject'] = e; a[e] = a[e] || function () {
+        (a[e].q = a[e].q || []).push(arguments)
+        }, a[e].l = 1 * Date.now(); f = b.createElement(c),
+        g = b.getElementsByTagName(c)[0]; f.defer = 1; f.src = d; g.parentNode.insertBefore(f, g)
       })(window, document, 'script', '//device.clearsale.com.br/p/fp.js', 'csdp');
-      csdp('app', '${fingerprintApp || 'seu_app'}');
-      csdp('sessionid', '${fingerPrintId}');`
+      csdp('app', '${app}');
+      ${sessionId ? `csdp('sessionid', '${sessionId}');` : "csdp('outputsessionid', 'mySessionId');"}
+    `
+    const scriptElement = document.createElement('script')
+    scriptElement.innerHTML = scriptContent
+    document.body.appendChild(scriptElement)
+  }
 
-    const newScript = document.createElement('script')
-    newScript.innerHTML = elementScript
-    document.body.appendChild(newScript)
-  }, 100)
+  injectClearSaleScript(fingerprintApp)
 
   window._braspagHashCard = function (cardClient) {
-    document.body.appendChild(newScript)
+    const fingerPrintId = document.getElementById('mySessionId').value
+    if (fingerPrintId && fingerPrintId !== '') {
+      console.log('Session ID captured:', fingerPrintId)
+      injectClearSaleScript(fingerprintApp, fingerPrintId)
+    } else {
+      return Promise.reject(new Error('Session ID (mySessionId) not captured.'))
+    }
+
     const elementsForm = `
     <input type="text" class="bp-sop-cardtype" value="creditCard" style="display: none;>
     <input type="text" class="bp-sop-cardcvvc" value="${cardClient.cvc}" style="display: none;">
@@ -59,12 +56,11 @@
       const options = {
         accessToken,
         onSuccess (response) {
-          // console.log('>', response)
           if (response.PaymentToken) {
             const data = JSON.stringify({ token: response.PaymentToken, fingerPrintId })
             resolve(window.btoa(data))
           } else {
-            const error = new Error('PaymentToken not found')
+            const error = new Error('Payment Token not found. Please try again or refresh the page.')
             reject(error)
           }
         },
