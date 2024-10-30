@@ -105,7 +105,7 @@ module.exports = (appData, orderId, params, methodPayment, isCielo) => {
         CreditCard: {
           PaymentToken: hashCard.token
         },
-        Capture: true,
+        Capture: false,
         FraudAnalysis: parseFraudAnalysis(appData, params, Address, hashCard.fingerPrintId)
       }
     )
